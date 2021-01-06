@@ -9,26 +9,38 @@ namespace NPSMLib
 {
     public class MediaPlaybackDataSource
     {
-        const string ID_MS_MEDIA_SCHEMA_PHOTO = "{6FB2E74A-B8CB-40BB-93F3-FAC5F00FA203}";
-        const string ID_MS_MEDIA_SCHEMA_VIDEO = "{DB9830BD-3AB3-4FAB-8A37-1A995F7FF74B}";
-        const string ID_MS_MEDIA_SCHEMA_MUSIC = "{D1607DBC-E323-4BE2-86A1-48A42A28441E}";
+        private const string ID_MS_MEDIA_SCHEMA_PHOTO = "{6FB2E74A-B8CB-40BB-93F3-FAC5F00FA203}";
+        private const string ID_MS_MEDIA_SCHEMA_VIDEO = "{DB9830BD-3AB3-4FAB-8A37-1A995F7FF74B}";
+        private const string ID_MS_MEDIA_SCHEMA_MUSIC = "{D1607DBC-E323-4BE2-86A1-48A42A28441E}";
 
-        static PROPERTYKEY PKEY_Title = new PROPERTYKEY { fmtid = new Guid("F29F85E0-4FF9-1068-AB91-08002B27B3D9"), pid = 0x2 };
-        static PROPERTYKEY PKEY_Music_TrackNumber = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x7 };
-        static PROPERTYKEY PKEY_ThumbnailStream = new PROPERTYKEY { fmtid = new Guid("F29F85E0-4FF9-1068-AB91-08002B27B3D9"), pid = 0x1B };
-        static PROPERTYKEY PKEY_Music_Genre = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0xB };
-        static PROPERTYKEY PKEY_Music_Artist = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x2 };
-        static PROPERTYKEY PKEY_Music_AlbumTitle = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x4 };
-        static PROPERTYKEY PKEY_Media_ClassPrimaryID = new PROPERTYKEY { fmtid = new Guid("64440492-4C8B-11D1-8B70-080036B11A03"), pid = 0xD };
-
+        private static PROPERTYKEY PKEY_Title = new PROPERTYKEY { fmtid = new Guid("F29F85E0-4FF9-1068-AB91-08002B27B3D9"), pid = 0x2 };
+        private static PROPERTYKEY PKEY_Music_TrackNumber = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x7 };
+        private static PROPERTYKEY PKEY_ThumbnailStream = new PROPERTYKEY { fmtid = new Guid("F29F85E0-4FF9-1068-AB91-08002B27B3D9"), pid = 0x1B };
+        private static PROPERTYKEY PKEY_Music_Genre = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0xB };
+        private static PROPERTYKEY PKEY_Music_Artist = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x2 };
+        private static PROPERTYKEY PKEY_Music_AlbumTitle = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x4 };
+        private static PROPERTYKEY PKEY_Media_ClassPrimaryID = new PROPERTYKEY { fmtid = new Guid("64440492-4C8B-11D1-8B70-080036B11A03"), pid = 0xD };
         //Untested
-        static PROPERTYKEY PKEY_Music_AlbumArtist = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0xD };
-        static PROPERTYKEY PKEY_AlbumTrackCount = new PROPERTYKEY { fmtid = new Guid("BAC8804B-BAA1-4E3F-9A11-EFB3EA519859"), pid = 0x2 };
-        static PROPERTYKEY PKEY_Media_SubTitle = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x26 };
-        IMediaPlaybackDataSource playbackDataSource;
-        internal IMediaPlaybackDataSource MediaPlaybackDataSourceInterface { get => playbackDataSource; }
+        private static PROPERTYKEY PKEY_Music_AlbumArtist = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0xD };
+        private static PROPERTYKEY PKEY_AlbumTrackCount = new PROPERTYKEY { fmtid = new Guid("BAC8804B-BAA1-4E3F-9A11-EFB3EA519859"), pid = 0x2 };
+        private static PROPERTYKEY PKEY_Media_SubTitle = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x26 };
 
-        internal MediaPlaybackDataSource(IMediaPlaybackDataSource source) => playbackDataSource = source;
+        private readonly ushort osbuild;
+        private readonly object playbackDataSourceIUnknown;
+        private readonly IMediaPlaybackDataSource_10586 playbackDataSource_10586;
+        private readonly IMediaPlaybackDataSource_20279 playbackDataSource_20279;
+
+        internal object GetIUnknownInterface { get => playbackDataSourceIUnknown; }
+
+        internal MediaPlaybackDataSource(object playbackDataSourceIUnknown, ushort OSBuild)
+        {
+            this.osbuild = OSBuild;
+            this.playbackDataSourceIUnknown = playbackDataSourceIUnknown;
+            if (osbuild >= 20279)
+                playbackDataSource_20279 = (IMediaPlaybackDataSource_20279)playbackDataSourceIUnknown;
+            else
+                playbackDataSource_10586 = (IMediaPlaybackDataSource_10586)playbackDataSourceIUnknown;
+        }
 
         public static MediaPlaybackType MediaSchemaToMediaPlaybackType(string mediaSchema)
         {
@@ -45,56 +57,60 @@ namespace NPSMLib
         public MediaObjectInfo GetMediaObjectInfo()
         {
             PROPVARIANT pVariant;
+            IPropertyStore propStore;
 
             string title = "", artist = "", albumTitle = "", mediaClassPrimaryID = "", albumArtist = "", subtitle = "";
             string[] genres = new string[0];
             uint trackNumber = 0, albumTrackCount = 0;
 
-            playbackDataSource.GetMediaObjectInfo(out var propVar);
+            if (osbuild >= 20279)
+                playbackDataSource_20279.GetMediaObjectInfo(out propStore);
+            else
+                playbackDataSource_10586.GetMediaObjectInfo(out propStore);
 
-            if (propVar.GetValue(ref PKEY_Title, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore.GetValue(ref PKEY_Title, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
             {
                 title = Marshal.PtrToStringUni(pVariant.union.pwszVal);
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Music_Artist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore.GetValue(ref PKEY_Music_Artist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
             {
                 artist = Marshal.PtrToStringUni(pVariant.union.pwszVal);
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Music_AlbumTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore.GetValue(ref PKEY_Music_AlbumTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
             {
                 albumTitle = Marshal.PtrToStringUni(pVariant.union.pwszVal);
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Music_TrackNumber, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
+            if (propStore.GetValue(ref PKEY_Music_TrackNumber, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
             {
                 trackNumber = pVariant.union.ulVal;
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Music_AlbumArtist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore.GetValue(ref PKEY_Music_AlbumArtist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
             {
                 albumArtist = Marshal.PtrToStringUni(pVariant.union.pwszVal);
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_AlbumTrackCount, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
+            if (propStore.GetValue(ref PKEY_AlbumTrackCount, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
             {
                 albumTrackCount = pVariant.union.ulVal;
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Media_SubTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore.GetValue(ref PKEY_Media_SubTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
             {
                 subtitle = Marshal.PtrToStringUni(pVariant.union.pwszVal);
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Music_Genre, out pVariant) == 0 && pVariant.vt == (VARTYPE.VT_VECTOR | VARTYPE.VT_LPWSTR))
+            if (propStore.GetValue(ref PKEY_Music_Genre, out pVariant) == 0 && pVariant.vt == (VARTYPE.VT_VECTOR | VARTYPE.VT_LPWSTR))
             {
                 var countStr = pVariant.union.calpwstr.cElems;
                 genres = new string[countStr];
@@ -104,7 +120,7 @@ namespace NPSMLib
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 
-            if (propVar.GetValue(ref PKEY_Media_ClassPrimaryID, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore.GetValue(ref PKEY_Media_ClassPrimaryID, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
             {
                 mediaClassPrimaryID = Marshal.PtrToStringUni(pVariant.union.pwszVal);
                 NativeMethods.PropVariantClear(ref pVariant);
@@ -117,8 +133,14 @@ namespace NPSMLib
         {
             Stream outStream = null;
 
-            playbackDataSource.GetMediaObjectInfo(out var propVar);
-            if (propVar.GetValue(ref PKEY_ThumbnailStream, out PROPVARIANT pVariant) == 0 && pVariant.vt == VARTYPE.VT_STREAM)
+            IPropertyStore propStore;
+
+            if (osbuild >= 20279)
+                playbackDataSource_20279.GetMediaObjectInfo(out propStore);
+            else
+                playbackDataSource_10586.GetMediaObjectInfo(out propStore);
+
+            if (propStore.GetValue(ref PKEY_ThumbnailStream, out PROPVARIANT pVariant) == 0 && pVariant.vt == VARTYPE.VT_STREAM)
             {
                 var inStream = (IStream)Marshal.GetObjectForIUnknown(pVariant.union.pStream);
                 outStream = new MemoryStream();
@@ -150,31 +172,73 @@ namespace NPSMLib
 
         public MediaPlaybackInfo GetMediaPlaybackInfo()
         {
-            playbackDataSource.GetMediaPlaybackInfo(out var info);
+            MediaPlaybackInfo info;
+            if (osbuild >= 20279)
+                playbackDataSource_20279.GetMediaPlaybackInfo(out info);
+            else
+                playbackDataSource_10586.GetMediaPlaybackInfo(out info);
             return info;
         }
 
         public MediaTimelineProperties GetMediaTimelineProperties()
         {
-            playbackDataSource.GetMediaTimelineProperties(out var props);
+            MediaTimelineProperties props;
+            if (osbuild >= 20279)
+                playbackDataSource_20279.GetMediaTimelineProperties(out props);
+            else
+                playbackDataSource_10586.GetMediaTimelineProperties(out props);
             return props;
         }
 
         public string GetParentApplicationId()
         {
-            playbackDataSource.GetParentApplicationId(out var id);
+            string id;
+            if (osbuild >= 20279)
+                playbackDataSource_20279.GetParentApplicationId(out id);
+            else
+                playbackDataSource_10586.GetParentApplicationId(out id);
             return id;
         }
 
-        public void SendMediaPlaybackCommand(MediaPlaybackCommands command) => playbackDataSource.SendMediaPlaybackCommand(command);
+        public void SendMediaPlaybackCommand(MediaPlaybackCommands command)
+        {
+            if (osbuild >= 20279)
+                playbackDataSource_20279.SendMediaPlaybackCommand(command);
+            else
+                playbackDataSource_10586.SendMediaPlaybackCommand(command);
+        }
 
-        public void SendPlaybackPositionChangeRequest(long requestedPlaybackPosition) => playbackDataSource.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
+        public void SendPlaybackPositionChangeRequest(long requestedPlaybackPosition)
+        {
+            if (osbuild >= 20279)
+                playbackDataSource_20279.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
+            else
+                playbackDataSource_10586.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
+        }
 
-        public void SendPlaybackRateChangeRequest(double requestedPlaybackRate) => playbackDataSource.SendPlaybackRateChangeRequest(requestedPlaybackRate);
+        public void SendPlaybackRateChangeRequest(double requestedPlaybackRate)
+        {
+            if (osbuild >= 20279)
+                playbackDataSource_20279.SendPlaybackRateChangeRequest(requestedPlaybackRate);
+            else
+                playbackDataSource_10586.SendPlaybackRateChangeRequest(requestedPlaybackRate);
+        }
 
-        public void SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode) => playbackDataSource.SendRepeatModeChangeRequest(requestedRepeatMode);
+        public void SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode)
+        {
+            if (osbuild >= 20279)
+                playbackDataSource_20279.SendRepeatModeChangeRequest(requestedRepeatMode);
+            else
+                playbackDataSource_10586.SendRepeatModeChangeRequest(requestedRepeatMode);
+        }
 
-        public void SendShuffleEnabledChangeRequest(bool requestedShuffle) => playbackDataSource.SendShuffleEnabledChangeRequest(requestedShuffle);
+        public void SendShuffleEnabledChangeRequest(bool requestedShuffle)
+        {
+            if (osbuild >= 20279)
+                playbackDataSource_20279.SendShuffleEnabledChangeRequest(requestedShuffle);
+            else
+                playbackDataSource_10586.SendShuffleEnabledChangeRequest(requestedShuffle);
+        }
 
         #region Event
 
@@ -192,8 +256,12 @@ namespace NPSMLib
                 {
                     if (subscribers == 0)
                     {
-                        eventHandler = new MediaPlaybackDataChangedEventHandler(this);
-                        var akka = playbackDataSource.RegisterEventHandler(eventHandler, out var token);
+                        eventHandler = new MediaPlaybackDataChangedEventHandler(this, osbuild);
+                        NPSMEventRegistrationToken token;
+                        if (osbuild >= 20279)
+                            playbackDataSource_20279.RegisterEventHandler(eventHandler, out token);
+                        else
+                            playbackDataSource_10586.RegisterEventHandler(eventHandler, out token);
                         eventHandler.Token = token;
                     }
                     subscribers++;
@@ -208,7 +276,10 @@ namespace NPSMLib
                     subscribers--;
                     if (subscribers == 0)
                     {
-                        playbackDataSource.UnregisterEventHandler(eventHandler.Token);
+                        if (osbuild >= 20279)
+                            playbackDataSource_20279.UnregisterEventHandler(eventHandler.Token);
+                        else
+                            playbackDataSource_10586.UnregisterEventHandler(eventHandler.Token);
                         eventHandler = null;
                     }
 
@@ -219,17 +290,19 @@ namespace NPSMLib
 
         class MediaPlaybackDataChangedEventHandler : IMediaPlaybackDataChangedEventHandler
         {
-            internal lEventRegistrationToken Token { get; set; }
+            internal NPSMEventRegistrationToken Token { get; set; }
             private MediaPlaybackDataSource CurrentMediaPlaybackInstance { get; set; }
-            public MediaPlaybackDataChangedEventHandler(MediaPlaybackDataSource currentSessionInstance)
+            private ushort OSBuild { get; set; }
+            public MediaPlaybackDataChangedEventHandler(MediaPlaybackDataSource currentSessionInstance, ushort osbuild)
             {
                 CurrentMediaPlaybackInstance = currentSessionInstance;
+                OSBuild = osbuild;
             }
 
-            public void OnMediaPlaybackDataChangedEvent(IMediaPlaybackDataSource source, MediaPlaybackDataChangedEvent dataChangedEvent)
+            public void OnMediaPlaybackDataChangedEvent(object source /* IMediaPlaybackDataSource */, MediaPlaybackDataChangedEvent dataChangedEvent)
             {
                 CurrentMediaPlaybackInstance.bMediaPlaybackDataChanged?.Invoke(CurrentMediaPlaybackInstance, 
-                    new MediaPlaybackDataChangedArgs { MediaPlaybackDataSource = new MediaPlaybackDataSource(source), DataChangedEvent = dataChangedEvent });
+                    new MediaPlaybackDataChangedArgs { MediaPlaybackDataSource = new MediaPlaybackDataSource(source, OSBuild), DataChangedEvent = dataChangedEvent });
             }
         }
 

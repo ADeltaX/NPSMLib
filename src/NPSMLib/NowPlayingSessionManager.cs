@@ -7,25 +7,27 @@ namespace NPSMLib
 {
     public class NowPlayingSessionManager
     {
-        static Guid CLSID_NowPlayingSessionManager = new Guid("BCBB9860-C012-4AD7-A938-6E337AE6ABA5");
-
-        INowPlayingSessionManager manager;
-
+        private readonly ushort osbuild;
+        private readonly object sessionManagerIUnknown;
+        //cache to prevent calling QueryInterface each time it casts
+        private readonly INowPlayingSessionManager_19041 sessionManager_19041;
+        private readonly INowPlayingSessionManager_10586 sessionManager_10586;
+        
         /// <summary>
         /// Handles Now Playing sessions.
         /// Can throw if the underlaying COM interface fails to create
         /// </summary>
-        public NowPlayingSessionManager()
+        public NowPlayingSessionManager(ushort OSBuild)
         {
-            Guid guid_INowPlayingSessionManager = new Guid("3b6a7908-ce07-4ba9-878c-6e4a15db5e5b"); //.NET Standard 2.0+ -> typeof(INowPlayingSessionManager).GUID;
-            NativeMethods.CoCreateInstance(ref CLSID_NowPlayingSessionManager, null, 4 /* CLSCTX_LOCAL_SERVER */, ref guid_INowPlayingSessionManager, out object INowPlayingSessionManagerObj);
+            osbuild = OSBuild;
+            Guid guid_INowPlayingSessionManager = OSBuild >= 19041 ? new Guid("3b6a7908-ce07-4ba9-878c-6e4a15db5e5b") : new Guid("A7052211-8B56-43C4-8F26-12852F7303A3");
+            NativeMethods.CoCreateInstance(ref CLSID_NowPlayingSessionManager, null, 4 /* CLSCTX_LOCAL_SERVER */, ref guid_INowPlayingSessionManager, out sessionManagerIUnknown);
 
-            manager = (INowPlayingSessionManager)INowPlayingSessionManagerObj;
-            
-            //TODO ?
-            //manager.AddSession
+            if (osbuild >= 19041)
+                sessionManager_19041 = (INowPlayingSessionManager_19041)sessionManagerIUnknown;
+            else
+                sessionManager_10586 = (INowPlayingSessionManager_10586)sessionManagerIUnknown;
         }
-
 
         /// <summary>
         /// Get the current active session
@@ -34,8 +36,14 @@ namespace NPSMLib
         { 
             get 
             {
-                manager.get_CurrentSession(out var session);
-                return session == null ? null : new NowPlayingSession(session);
+                object sessionIUnknown = null;
+
+                if (osbuild >= 19041)
+                    sessionManager_19041.get_CurrentSession(out sessionIUnknown);
+                else
+                    sessionManager_10586.get_CurrentSession(out sessionIUnknown);
+
+                return sessionIUnknown == null ? null : new NowPlayingSession(sessionIUnknown, osbuild);
             } 
         }
 
@@ -46,17 +54,29 @@ namespace NPSMLib
         {
             get
             {
-                manager.get_Count(out ulong count);
+                ulong count;
+                if (osbuild >= 19041)
+                    sessionManager_19041.get_Count(out count);
+                else
+                    sessionManager_10586.get_Count(out count);
+
                 return count;
             }
         }
 
         public NowPlayingSession[] GetSessions()
         {
-            manager.GetSessions(out uint count, out var sessions);
+            object[] sessionsIUnknown;
+            uint count = 0;
+
+            if (osbuild >= 19041)
+                sessionManager_19041.GetSessions(out count, out sessionsIUnknown);
+            else
+                sessionManager_10586.GetSessions(out count, out sessionsIUnknown);
+
             NowPlayingSession[] array = new NowPlayingSession[count];
             for (uint i = 0; i < count; i++)
-                array[i] = new NowPlayingSession(sessions[i]);
+                array[i] = new NowPlayingSession(sessionsIUnknown[i], osbuild);
             return array;
         }
 
@@ -65,23 +85,38 @@ namespace NPSMLib
         /// </summary>
         public void SetNextCurrentSession()
         {
-            manager.SetCurrentNextSession();
+            if (osbuild >= 19041)
+                sessionManager_19041.SetCurrentNextSession();
+            else
+                sessionManager_10586.SetCurrentNextSession();
         }
 
         public void SetCurrentSession(NowPlayingSessionInfo pInfo)
         {
-            manager.SetCurrentSession(pInfo.NowPlayingSessionInfoInterface);
+            if (osbuild >= 19041)
+                sessionManager_19041.SetCurrentSession(pInfo.GetIUnknownInterface);
+            else
+                sessionManager_10586.SetCurrentSession(pInfo.GetIUnknownInterface);
         }
 
         public void RemoveSession(NowPlayingSessionInfo pInfo)
         {
-            manager.RemoveSession(pInfo.NowPlayingSessionInfoInterface);
+            if (osbuild >= 19041)
+                sessionManager_19041.RemoveSession(pInfo.GetIUnknownInterface);
+            else
+                sessionManager_10586.RemoveSession(pInfo.GetIUnknownInterface);
         }
 
         public NowPlayingSession FindSession(NowPlayingSessionInfo pInfo)
         {
-            manager.FindSession(pInfo.NowPlayingSessionInfoInterface, out var session);
-            return new NowPlayingSession(session);
+            object sessionIUnknown;
+
+            if (osbuild >= 19041)
+                sessionManager_19041.FindSession(pInfo.GetIUnknownInterface, out sessionIUnknown);
+            else
+                sessionManager_10586.FindSession(pInfo.GetIUnknownInterface, out sessionIUnknown);
+
+            return new NowPlayingSession(sessionIUnknown, osbuild);
         }
 
         /// <summary>
@@ -90,13 +125,22 @@ namespace NPSMLib
         /// <param name="hWnd">Handle to the window present in any session</param>
         public void Refresh(IntPtr hWnd)
         {
-            manager.Refresh(hWnd);
+            if (osbuild >= 19041)
+                sessionManager_19041.Refresh(hWnd);
+            else
+                sessionManager_10586.Refresh(hWnd);
         }
 
         public void Update(bool fEnabled, IntPtr hwnd, uint dwPID, ulong unknown, MediaPlaybackDataSource pSource)
         {
-            manager.Update(fEnabled, hwnd, dwPID, unknown, pSource.MediaPlaybackDataSourceInterface);
+            if (osbuild >= 19041)
+                sessionManager_19041.Update(fEnabled, hwnd, dwPID, unknown, pSource.GetIUnknownInterface);
+            else
+                sessionManager_10586.Update(fEnabled, hwnd, dwPID, pSource.GetIUnknownInterface);
         }
+
+        //TODO
+        //manager.AddSession
 
         #region Event
 
@@ -114,8 +158,12 @@ namespace NPSMLib
                 {
                     if (subscribers == 0)
                     {
-                        eventHandler = new NowPlayingSessionManagerEventHandler(this);
-                        var akka = manager.RegisterEventHandler(eventHandler, out var token);
+                        eventHandler = new NowPlayingSessionManagerEventHandler(this, osbuild);
+                        NPSMEventRegistrationToken token;
+                        if (osbuild >= 19041)
+                            sessionManager_19041.RegisterEventHandler(eventHandler, out token);
+                        else
+                            sessionManager_10586.RegisterEventHandler(eventHandler, out token);
                         eventHandler.Token = token;
                     }
                     subscribers++;
@@ -130,7 +178,10 @@ namespace NPSMLib
                     subscribers--;
                     if (subscribers == 0)
                     {
-                        manager.UnregisterEventHandler(eventHandler.Token);
+                        if (osbuild >= 19041)
+                            sessionManager_19041.UnregisterEventHandler(eventHandler.Token);
+                        else
+                            sessionManager_10586.UnregisterEventHandler(eventHandler.Token);
                         eventHandler = null;
                     }
 
@@ -141,17 +192,19 @@ namespace NPSMLib
 
         class NowPlayingSessionManagerEventHandler : INowPlayingSessionManagerEventHandler
         {
-            internal lEventRegistrationToken Token { get; set; }
+            internal NPSMEventRegistrationToken Token { get; set; }
             private NowPlayingSessionManager CurrentSessionInstance { get; set; }
-            public NowPlayingSessionManagerEventHandler(NowPlayingSessionManager currentSessionInstance)
+            private ushort OSBuild { get; set; }
+            public NowPlayingSessionManagerEventHandler(NowPlayingSessionManager currentSessionInstance, ushort osbuild)
             {
                 CurrentSessionInstance = currentSessionInstance;
+                OSBuild = osbuild;
             }
-            public void OnChange(NowPlayingSessionManagerNotificationType notificationType, INowPlayingSessionInfo pInfo, [MarshalAs(UnmanagedType.LPWStr)] string unknown)
+            public void OnChange(NowPlayingSessionManagerNotificationType notificationType, object pINowPlayingSessionInfoIUnknown, [MarshalAs(UnmanagedType.LPWStr)] string unknown)
             {
                 //forward to subscribers
                 CurrentSessionInstance.bSessionListChanged?.Invoke(CurrentSessionInstance, 
-                    new NowPlayingSessionManagerEventArgs { NotificationType = notificationType, NowPlayingSessionInfo = new NowPlayingSessionInfo(pInfo), SessionTypeString = unknown });
+                    new NowPlayingSessionManagerEventArgs { NotificationType = notificationType, NowPlayingSessionInfo = new NowPlayingSessionInfo(pINowPlayingSessionInfoIUnknown, OSBuild), SessionTypeString = unknown });
             }
         }
 

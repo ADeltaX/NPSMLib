@@ -1,35 +1,55 @@
-﻿using NPSMLib.Interop;
-using System;
+﻿using System;
 using static NPSMLib.Interop.COMInterop;
 
 namespace NPSMLib
 {
     public class NowPlayingSessionInfo : IEquatable<NowPlayingSessionInfo>
     {
-        INowPlayingSessionInfo pInfo;
+        private readonly ushort osbuild;
+        private readonly object infoIUnknown;
+        private readonly INowPlayingSessionInfo_19041 info_19041;
+        private readonly INowPlayingSessionInfo_10586 info_10586;
 
-        internal INowPlayingSessionInfo NowPlayingSessionInfoInterface { get => pInfo; }
+        internal object GetIUnknownInterface { get => infoIUnknown; }
 
-        internal NowPlayingSessionInfo(INowPlayingSessionInfo info)
+        internal NowPlayingSessionInfo(object infoIUnknown, ushort OSBuild)
         {
-            pInfo = info;
+            this.osbuild = OSBuild;
+            this.infoIUnknown = infoIUnknown;
+            if (osbuild >= 19041)
+                info_19041 = (INowPlayingSessionInfo_19041)infoIUnknown;
+            else
+                info_10586 = (INowPlayingSessionInfo_10586)infoIUnknown;
         }
 
         public void GetInfo(out IntPtr hWnd, out uint PID, out string DeviceId)
         {
-            pInfo.GetInfo(out hWnd, out PID, out DeviceId);
+            if (osbuild >= 19041)
+                info_19041.GetInfo(out hWnd, out PID, out DeviceId);
+            else
+                info_10586.GetInfo(out hWnd, out PID, out DeviceId);
         }
 
         public bool Equals(NowPlayingSessionInfo other)
         {
-            pInfo.IsEqual(other.pInfo, out bool val);
+            bool val;
+            if (osbuild >= 19041)
+                info_19041.IsEqual(other.infoIUnknown, out val);
+            else
+                info_10586.IsEqual(other.infoIUnknown, out val);
             return val;
         }
 
+        /// <summary>
+        /// 19041+
+        /// </summary>
+        /// <returns></returns>
         public bool IsRunningInContainerOS()
         {
-            pInfo.IsRunningInContainerOS(out bool val);
-            return val;
+            bool inContainerOS = false;
+            if (osbuild >= 19041)
+                info_19041.IsRunningInContainerOS(out inContainerOS);
+            return inContainerOS;
         }
     }
 }

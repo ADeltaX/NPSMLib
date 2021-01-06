@@ -1,5 +1,7 @@
 ﻿namespace NPSMLib
 {
+	//VALIDATED FOR: 20279-19041-18362-17763-17134-16299-15063-14393-10586
+
 	public enum NowPlayingSessionType
 	{
 		Unknown = 0x0,

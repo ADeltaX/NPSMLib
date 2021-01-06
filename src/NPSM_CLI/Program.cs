@@ -9,11 +9,13 @@ namespace NPSM_CLI
         static NowPlayingSessionManager manager;
         static NowPlayingSession session;
         static MediaPlaybackDataSource src;
+
+        static ushort GetCurrentWindowsBuild() => (ushort)Environment.OSVersion.Version.Build;
+
         static void Main(string[] args)
         {
-            manager = new NowPlayingSessionManager();
+            manager = new NowPlayingSessionManager(GetCurrentWindowsBuild());
             manager.SessionListChanged += SessionListChanged;
-
             SessionListChanged(null, null);
 
             char letter;
@@ -30,6 +32,8 @@ namespace NPSM_CLI
 
                 if (letter == 'a' || key.Key == ConsoleKey.LeftArrow)
                     src.SendMediaPlaybackCommand(MediaPlaybackCommands.Previous);
+
+                //TODO: REWIND/FASTFORWARD
 
                 //if (letter == 'r' && session != null)
                 //    src.SendMediaPlaybackCommand(MediaPlaybackCommands.Rewind);

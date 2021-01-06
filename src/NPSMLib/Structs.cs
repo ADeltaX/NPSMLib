@@ -5,6 +5,8 @@ using System.Text;
 
 namespace NPSMLib
 {
+    //VALIDATED FOR: 20279-19041-18362-17763-17134-16299-15063-14393-10586
+
     [StructLayout(LayoutKind.Sequential)]
     public struct MediaPlaybackInfo
     {
@@ -16,6 +18,9 @@ namespace NPSMLib
         readonly double playbackRate;
         readonly int shuffleEnabled;
 
+        //20279
+        //readonly long lastPlayingFileTime;
+
         public MediaPlaybackProps PropsValid { get => propsValid; }
         public MediaPlaybackCapabilities PlaybackCaps { get => playbackCaps; }
         public MediaPlaybackState PlaybackState { get => playbackState; }
@@ -23,6 +28,9 @@ namespace NPSMLib
         public MediaPlaybackRepeatMode RepeatMode { get => repeatMode; }
         public double PlaybackRate { get => playbackRate; }
         public bool ShuffleEnabled { get => shuffleEnabled != 0; }
+
+        //20279
+        //public DateTime LastPlayingFileTime { get => DateTime.FromFileTime(lastPlayingFileTime); }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -33,18 +41,22 @@ namespace NPSMLib
         readonly TimeSpan minSeekTime;
         readonly TimeSpan maxSeekTime;
         readonly TimeSpan position;
-        readonly long positionSetFileTime;
+
+        //17134+
+        //readonly long positionSetFileTime;
 
         public TimeSpan StartTime { get => startTime; }
         public TimeSpan EndTime { get => endTime; }
         public TimeSpan MinSeekTime { get => minSeekTime; }
         public TimeSpan MaxSeekTime { get => maxSeekTime; }
         public TimeSpan Position { get => position; }
-        public DateTime PositionSetFileTime { get => DateTime.FromFileTime(positionSetFileTime); }
+
+        //17134+
+        //public DateTime PositionSetFileTime { get => DateTime.FromFileTime(positionSetFileTime); }
     }
 
 
-    //Not related to COM structs
+    //Not related to NPSM COM structs
     public struct MediaObjectInfo
     {
         readonly string albumArtist;
