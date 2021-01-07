@@ -10,6 +10,7 @@ namespace NPSMLib.Interop
         //VALIDATED FOR: 20279-19041-18362-17763-17134-16299-15063-14393-10586
 
         internal static Guid CLSID_NowPlayingSessionManager = new Guid("BCBB9860-C012-4AD7-A938-6E337AE6ABA5");
+
         public struct NPSMEventRegistrationToken
         {
             private readonly long value;
@@ -22,22 +23,32 @@ namespace NPSMLib.Interop
         internal interface INowPlayingSessionManager_19041
         {
             int get_Count(out ulong pCount);
+
             [PreserveSig]
             int get_CurrentSession([MarshalAs(UnmanagedType.IUnknown)] out object ppSession /* INowPlayingSession */);
+
             int AddSession(NowPlayingSessionType type, IntPtr hwnd, uint dwPID, [MarshalAs(UnmanagedType.LPWStr)] string appId,
                 [MarshalAs(UnmanagedType.LPWStr)] string szSourceDeviceId, [MarshalAs(UnmanagedType.LPWStr)] string szRenderDeviceId,
                 [MarshalAs(UnmanagedType.LPWStr)] string source, [MarshalAs(UnmanagedType.IUnknown)] object pMediaControl /* IMediaPlaybackDataSource */,
                 [MarshalAs(UnmanagedType.IUnknown)] object pConnection, [MarshalAs(UnmanagedType.Bool)] bool fMarkAsCurrentSession,
                 IntPtr processHandle);
+
             int RemoveSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */);
+
             int GetSessions(out uint pdwCount, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown)] out object[] pppSessions /* INowPlayingSession[] */);
+
             int FindSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.IUnknown)] out object ppSession /* INowPlayingSession */);
+
             int SetCurrentSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */);
+
             int SetCurrentNextSession();
+
             int Refresh(IntPtr hwnd);
+
             int Update([MarshalAs(UnmanagedType.Bool)] bool fEnabled, IntPtr hwnd, uint dwPID, ulong unknown, [MarshalAs(UnmanagedType.IUnknown)] object pSource /* IMediaPlaybackDataSource */); //DIFF
 
             int RegisterEventHandler(INowPlayingSessionManagerEventHandler pEventHandler, out NPSMEventRegistrationToken pToken);
+
             int UnregisterEventHandler(NPSMEventRegistrationToken token);
         }
 
@@ -46,21 +57,32 @@ namespace NPSMLib.Interop
         internal interface INowPlayingSessionManager_10586
         {
             int get_Count(out ulong pCount);
+
             [PreserveSig]
             int get_CurrentSession([MarshalAs(UnmanagedType.IUnknown)] out object ppSession /* INowPlayingSession */);
+
             int AddSession(NowPlayingSessionType type, IntPtr hwnd, uint dwPID, [MarshalAs(UnmanagedType.LPWStr)] string appId,
                 [MarshalAs(UnmanagedType.LPWStr)] string szSourceDeviceId, [MarshalAs(UnmanagedType.LPWStr)] string szRenderDeviceId,
                 [MarshalAs(UnmanagedType.LPWStr)] string source, [MarshalAs(UnmanagedType.IUnknown)] object pMediaControl /* IMediaPlaybackDataSource */,
                 [MarshalAs(UnmanagedType.IUnknown)] object pConnection, [MarshalAs(UnmanagedType.Bool)] bool fMarkAsCurrentSession,
                 IntPtr processHandle);
+
             int RemoveSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */);
+
             int GetSessions(out uint pdwCount, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown)] out object[] pppSessions /* INowPlayingSession[] */);
+
             int FindSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.IUnknown)] out object ppSession /* INowPlayingSession */);
+
             int SetCurrentSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */);
+
             int SetCurrentNextSession();
+
             int Refresh(IntPtr hwnd);
+
             int Update([MarshalAs(UnmanagedType.Bool)] bool fEnabled, IntPtr hwnd, uint dwPID, [MarshalAs(UnmanagedType.IUnknown)] object pSource /* IMediaPlaybackDataSource */); //DIFF
+
             int RegisterEventHandler(INowPlayingSessionManagerEventHandler pEventHandler, out NPSMEventRegistrationToken pToken);
+
             int UnregisterEventHandler(NPSMEventRegistrationToken token);
         }
 
@@ -73,14 +95,23 @@ namespace NPSMLib.Interop
         internal interface INowPlayingSession_14393
         {
             int get_SessionType(out NowPlayingSessionType pType);
+
             int get_SourceAppId([MarshalAs(UnmanagedType.LPWStr)] out string pszSrcAppId);
+
             int get_SourceDeviceId([MarshalAs(UnmanagedType.LPWStr)] out string pszSourceDeviceId);
+
             int get_RenderDeviceId([MarshalAs(UnmanagedType.LPWStr)] out string pszRenderId);
+
             int get_HWND(out IntPtr pHwnd);
+
             int get_PID(out uint pdwPID);
+
             int get_Info([MarshalAs(UnmanagedType.IUnknown)] out object ppInfo /* INowPlayingSessionInfo */);
+
             int get_Connection([MarshalAs(UnmanagedType.IUnknown)] out object ppUnknown);
+
             int ActivateMediaPlaybackDataSource([MarshalAs(UnmanagedType.IUnknown)] out object ppMediaControl /* IMediaPlaybackDataSource */);
+
             int BeginInteractionWithSession([MarshalAs(UnmanagedType.IUnknown)] out object ppSessionInteractionToken);
         }
 
@@ -89,13 +120,21 @@ namespace NPSMLib.Interop
         internal interface INowPlayingSession_10586
         {
             int get_SessionType(out NowPlayingSessionType pType);
+
             int get_SourceAppId([MarshalAs(UnmanagedType.LPWStr)] out string pszSrcAppId);
+
             int get_SourceDeviceId([MarshalAs(UnmanagedType.LPWStr)] out string pszSourceDeviceId);
+
             int get_RenderDeviceId([MarshalAs(UnmanagedType.LPWStr)] out string pszRenderId);
+
             int get_HWND(out IntPtr pHwnd);
+
             int get_PID(out uint pdwPID);
+
             int get_Info([MarshalAs(UnmanagedType.IUnknown)] out object ppInfo /* INowPlayingSessionInfo */);
+
             int get_Connection([MarshalAs(UnmanagedType.IUnknown)] out object ppUnknown);
+
             int ActivateMediaPlaybackDataSource([MarshalAs(UnmanagedType.IUnknown)] out object ppMediaControl /* IMediaPlaybackDataSource */);
         }
 
@@ -108,7 +147,9 @@ namespace NPSMLib.Interop
         internal interface INowPlayingSessionInfo_19041
         {
             int GetInfo(out IntPtr pHwnd, out uint pdwPID, [MarshalAs(UnmanagedType.LPWStr)] out string pszDeviceId);
+
             int IsRunningInContainerOS([MarshalAs(UnmanagedType.Bool)] out bool pfIsInContainer);
+
             int IsEqual([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.Bool)] out bool pfIsEqual);
         }
 
@@ -117,6 +158,7 @@ namespace NPSMLib.Interop
         internal interface INowPlayingSessionInfo_10586
         {
             int GetInfo(out IntPtr pHwnd, out uint pdwPID, [MarshalAs(UnmanagedType.LPWStr)] out string pszDeviceId);
+
             int IsEqual([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.Bool)] out bool pfIsEqual);
         }
 
@@ -129,17 +171,29 @@ namespace NPSMLib.Interop
         internal interface IMediaPlaybackDataSource_20279
         {
             int GetMediaPlaybackInfo(out MediaPlaybackInfo pPlaybackInfo);
+
             int SendMediaPlaybackCommand(MediaPlaybackCommands command);
+
             int GetMediaObjectInfo(out IPropertyStore ppMediaObjectInfo);
+
             int GetMediaTimelineProperties(out MediaTimelineProperties pTimelineProperties);
+
             int RegisterEventHandler(IMediaPlaybackDataChangedEventHandler handler, out NPSMEventRegistrationToken token);
+
             int UnregisterEventHandler(NPSMEventRegistrationToken token);
+
             int SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode);
+
             int SendPlaybackRateChangeRequest(double requestedPlaybackRate);
+
             int SendShuffleEnabledChangeRequest([MarshalAs(UnmanagedType.Bool)] bool requestedShuffle);
+
             int SendPlaybackPositionChangeRequest(long requestedPlaybackPosition);
+
             int GetParentApplicationId([MarshalAs(UnmanagedType.HString)] out string value);
+
             int GetMediaObjectInfoAsSet(Guid guid, [MarshalAs(UnmanagedType.IUnknown)] out object ppUnknown); //not implemented by MS, returns 0x80004001
+
             int GetIsRunningInGuestContainer([MarshalAs(UnmanagedType.Bool)] bool runningInContainer);
         }
 
@@ -148,15 +202,25 @@ namespace NPSMLib.Interop
         internal interface IMediaPlaybackDataSource_10586
         {
             int GetMediaPlaybackInfo(out MediaPlaybackInfo pPlaybackInfo);
+
             int SendMediaPlaybackCommand(MediaPlaybackCommands command);
+
             int GetMediaObjectInfo(out IPropertyStore ppMediaObjectInfo);
+
             int GetMediaTimelineProperties(out MediaTimelineProperties pTimelineProperties);
+
             int RegisterEventHandler(IMediaPlaybackDataChangedEventHandler handler, out NPSMEventRegistrationToken token);
+
             int UnregisterEventHandler(NPSMEventRegistrationToken token);
+
             int SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode);
+
             int SendPlaybackRateChangeRequest(double requestedPlaybackRate);
+
             int SendShuffleEnabledChangeRequest([MarshalAs(UnmanagedType.Bool)] bool requestedShuffle);
+
             int SendPlaybackPositionChangeRequest(long requestedPlaybackPosition);
+
             int GetParentApplicationId([MarshalAs(UnmanagedType.HString)] out string value);
         }
 
@@ -187,9 +251,13 @@ namespace NPSMLib.Interop
         internal interface IPropertyStore
         {
             int GetCount(out uint cProps);
+
             int GetAt(uint iProp, out PROPERTYKEY pkey);
+
             int GetValue(ref PROPERTYKEY key, out PROPVARIANT pv);
+
             int SetValue(ref PROPERTYKEY key, ref PROPVARIANT propvar);
+
             int Commit();
         }
 
