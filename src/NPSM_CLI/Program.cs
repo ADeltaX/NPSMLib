@@ -10,11 +10,9 @@ namespace NPSM_CLI
         static NowPlayingSession session;
         static MediaPlaybackDataSource src;
 
-        static ushort GetCurrentWindowsBuild() => (ushort)Environment.OSVersion.Version.Build;
-
         static void Main(string[] args)
         {
-            manager = new NowPlayingSessionManager(GetCurrentWindowsBuild());
+            manager = new NowPlayingSessionManager();
             manager.SessionListChanged += SessionListChanged;
             SessionListChanged(null, null);
 
@@ -81,7 +79,7 @@ namespace NPSM_CLI
                     Console.WriteLine("Album title: " + mediaDetails.AlbumTitle);
                     Console.WriteLine("Source AppId: " + session.SourceAppId);
                     Console.WriteLine("HWND: 0x" + session.Hwnd.ToString("X"));
-                    Console.WriteLine("Status: " + src.GetMediaPlaybackInfo().PlaybackState);
+                    Console.WriteLine("Status: " + src.GetMediaPlaybackInfo().LastPlayingFileTime);
                     Console.WriteLine("---------------------------------");
                 }
             }

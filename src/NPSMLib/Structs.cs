@@ -19,7 +19,13 @@ namespace NPSMLib
         readonly int shuffleEnabled;
 
         //20279
-        //readonly long lastPlayingFileTime;
+        readonly long lastPlayingFileTime;
+
+        //For future changes etc.. (prevents crash btw)
+        readonly long padding1;
+        readonly long padding2;
+        readonly long padding3;
+        readonly long padding4;
 
         public MediaPlaybackProps PropsValid { get => propsValid; }
         public MediaPlaybackCapabilities PlaybackCaps { get => playbackCaps; }
@@ -30,7 +36,7 @@ namespace NPSMLib
         public bool ShuffleEnabled { get => shuffleEnabled != 0; }
 
         //20279
-        //public DateTime LastPlayingFileTime { get => DateTime.FromFileTime(lastPlayingFileTime); }
+        public DateTime LastPlayingFileTime { get => DateTime.FromFileTime(lastPlayingFileTime); }
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -43,7 +49,13 @@ namespace NPSMLib
         readonly TimeSpan position;
 
         //17134+
-        //readonly long positionSetFileTime;
+        readonly long positionSetFileTime;
+
+        //For future changes etc.. (prevents crash btw)
+        readonly long padding1;
+        readonly long padding2;
+        readonly long padding3;
+        readonly long padding4;
 
         public TimeSpan StartTime { get => startTime; }
         public TimeSpan EndTime { get => endTime; }
@@ -52,7 +64,7 @@ namespace NPSMLib
         public TimeSpan Position { get => position; }
 
         //17134+
-        //public DateTime PositionSetFileTime { get => DateTime.FromFileTime(positionSetFileTime); }
+        public DateTime PositionSetFileTime { get => DateTime.FromFileTime(positionSetFileTime); }
     }
 
 
@@ -79,11 +91,11 @@ namespace NPSMLib
         public uint AlbumTrackCount { get => albumTrackCount; }
         public uint TrackNumber { get => trackNumber; }
 
-        internal MediaObjectInfo(string albumArtist, 
-            string albumTitle, 
-            string subtitle, 
-            string title, 
-            string artist, 
+        internal MediaObjectInfo(string albumArtist,
+            string albumTitle,
+            string subtitle,
+            string title,
+            string artist,
             string mediaClassPrimaryID,
             string[] genres,
             uint albumTrackCount,

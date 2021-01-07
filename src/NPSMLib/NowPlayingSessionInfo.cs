@@ -5,26 +5,36 @@ namespace NPSMLib
 {
     public class NowPlayingSessionInfo : IEquatable<NowPlayingSessionInfo>
     {
-        private readonly ushort osbuild;
         private readonly object infoIUnknown;
         private readonly INowPlayingSessionInfo_19041 info_19041;
         private readonly INowPlayingSessionInfo_10586 info_10586;
+        private readonly int numSelectInterface = 0;
 
         internal object GetIUnknownInterface { get => infoIUnknown; }
 
-        internal NowPlayingSessionInfo(object infoIUnknown, ushort OSBuild)
+        internal NowPlayingSessionInfo(object infoIUnknown)
         {
-            this.osbuild = OSBuild;
             this.infoIUnknown = infoIUnknown;
-            if (osbuild >= 19041)
-                info_19041 = (INowPlayingSessionInfo_19041)infoIUnknown;
+
+            if (infoIUnknown is INowPlayingSessionInfo_19041 tInfo_19041)
+            {
+                numSelectInterface = 19041;
+                info_19041 = tInfo_19041;
+            }
+            else if (infoIUnknown is INowPlayingSessionInfo_10586 tInfo_10586)
+            {
+                numSelectInterface = 10586;
+                info_10586 = tInfo_10586;
+            }
             else
-                info_10586 = (INowPlayingSessionInfo_10586)infoIUnknown;
+            {
+                throw new NotSupportedException("QueryInterface failed due to non-available interface/guid");
+            }
         }
 
         public void GetInfo(out IntPtr hWnd, out uint PID, out string DeviceId)
         {
-            if (osbuild >= 19041)
+            if (numSelectInterface == 19041)
                 info_19041.GetInfo(out hWnd, out PID, out DeviceId);
             else
                 info_10586.GetInfo(out hWnd, out PID, out DeviceId);
@@ -33,7 +43,7 @@ namespace NPSMLib
         public bool Equals(NowPlayingSessionInfo other)
         {
             bool val;
-            if (osbuild >= 19041)
+            if (numSelectInterface == 19041)
                 info_19041.IsEqual(other.infoIUnknown, out val);
             else
                 info_10586.IsEqual(other.infoIUnknown, out val);
@@ -47,7 +57,7 @@ namespace NPSMLib
         public bool IsRunningInContainerOS()
         {
             bool inContainerOS = false;
-            if (osbuild >= 19041)
+            if (numSelectInterface == 19041)
                 info_19041.IsRunningInContainerOS(out inContainerOS);
             return inContainerOS;
         }

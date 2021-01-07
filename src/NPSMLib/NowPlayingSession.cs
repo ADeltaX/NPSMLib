@@ -5,20 +5,29 @@ namespace NPSMLib
 {
     public class NowPlayingSession
     {
-        private readonly ushort osbuild;
         private readonly object sessionIUnknown;
-        private readonly INowPlayingSession_10586 session_10586;
         private readonly INowPlayingSession_14393 session_14393;
+        private readonly INowPlayingSession_10586 session_10586;
+        private readonly int numSelectInterface = 0;
 
-        internal NowPlayingSession(object sessionIUnknown, ushort OSBuild)
+        internal NowPlayingSession(object sessionIUnknown)
         {
-            this.osbuild = OSBuild;
             this.sessionIUnknown = sessionIUnknown;
 
-            if (osbuild >= 14393)
-                session_14393 = (INowPlayingSession_14393)sessionIUnknown;
+            if (sessionIUnknown is INowPlayingSession_14393 tSession_14393)
+            {
+                numSelectInterface = 14393;
+                session_14393 = tSession_14393;
+            }
+            else if (sessionIUnknown is INowPlayingSession_10586 tSession_10586)
+            {
+                numSelectInterface = 10586;
+                session_10586 = tSession_10586;
+            }
             else
-                session_10586 = (INowPlayingSession_10586)sessionIUnknown;
+            {
+                throw new NotSupportedException("QueryInterface failed due to non-available interface/guid");
+            }
         }
 
         public IntPtr Hwnd 
@@ -26,7 +35,7 @@ namespace NPSMLib
             get 
             {
                 IntPtr hWnd;
-                if (osbuild >= 14393)
+                if (numSelectInterface == 14393)
                     session_14393.get_HWND(out hWnd);
                 else
                     session_10586.get_HWND(out hWnd);
@@ -38,7 +47,7 @@ namespace NPSMLib
             get
             {
                 uint pid;
-                if (osbuild >= 14393)
+                if (numSelectInterface == 14393)
                     session_14393.get_PID(out pid);
                 else
                     session_10586.get_PID(out pid);
@@ -50,7 +59,7 @@ namespace NPSMLib
             get
             {
                 string id;
-                if (osbuild >= 14393)
+                if (numSelectInterface == 14393)
                     session_14393.get_RenderDeviceId(out id);
                 else
                     session_10586.get_RenderDeviceId(out id);
@@ -62,7 +71,7 @@ namespace NPSMLib
             get
             {
                 string id;
-                if (osbuild >= 14393)
+                if (numSelectInterface == 14393)
                     session_14393.get_SourceAppId(out id);
                 else
                     session_10586.get_SourceAppId(out id);
@@ -74,7 +83,7 @@ namespace NPSMLib
             get
             {
                 string id;
-                if (osbuild >= 14393)
+                if (numSelectInterface == 14393)
                     session_14393.get_SourceDeviceId(out id);
                 else
                     session_10586.get_SourceDeviceId(out id);
@@ -90,7 +99,7 @@ namespace NPSMLib
             get
             {
                 object iUnknown;
-                if (osbuild >= 14393)
+                if (numSelectInterface == 14393)
                     session_14393.get_Connection(out iUnknown);
                 else
                     session_10586.get_Connection(out iUnknown);
@@ -98,34 +107,36 @@ namespace NPSMLib
             }
         }
 
+        //TODO: Can throw if fail
         public MediaPlaybackDataSource ActivateMediaPlaybackDataSource()
         {
             object imediaPlaybackDataSourceIUnknown;
-            if (osbuild >= 14393)
+            if (numSelectInterface == 14393)
                 session_14393.ActivateMediaPlaybackDataSource(out imediaPlaybackDataSourceIUnknown);
             else
                 session_10586.ActivateMediaPlaybackDataSource(out imediaPlaybackDataSourceIUnknown);
-            return new MediaPlaybackDataSource(imediaPlaybackDataSourceIUnknown, osbuild);
+            return new MediaPlaybackDataSource(imediaPlaybackDataSourceIUnknown);
         }
 
         public NowPlayingSessionType GetSessionType()
         {
             NowPlayingSessionType pType;
-            if (osbuild >= 14393)
+            if (numSelectInterface == 14393)
                 session_14393.get_SessionType(out pType);
             else
                 session_10586.get_SessionType(out pType);
             return pType;
         }
 
+        //TODO: Can throw if fail
         public NowPlayingSessionInfo GetSessionInfo()
         {
             object pInfoIUnknown;
-            if (osbuild >= 14393)
+            if (numSelectInterface == 14393)
                 session_14393.get_Info(out pInfoIUnknown);
             else
                 session_10586.get_Info(out pInfoIUnknown);
-            return new NowPlayingSessionInfo(pInfoIUnknown, osbuild);
+            return new NowPlayingSessionInfo(pInfoIUnknown);
         }
 
 
@@ -136,7 +147,7 @@ namespace NPSMLib
         public object BeginInteractionWithSession()
         {
             object IUnknownToken = null;
-            if (osbuild >= 14393)
+            if (numSelectInterface == 14393)
                 session_14393.BeginInteractionWithSession(out IUnknownToken);
 
             return IUnknownToken;

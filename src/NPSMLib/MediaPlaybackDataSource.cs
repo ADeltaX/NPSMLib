@@ -25,21 +25,32 @@ namespace NPSMLib
         private static PROPERTYKEY PKEY_AlbumTrackCount = new PROPERTYKEY { fmtid = new Guid("BAC8804B-BAA1-4E3F-9A11-EFB3EA519859"), pid = 0x2 };
         private static PROPERTYKEY PKEY_Media_SubTitle = new PROPERTYKEY { fmtid = new Guid("56A3372E-CE9C-11D2-9F0E-006097C686F6"), pid = 0x26 };
 
-        private readonly ushort osbuild;
         private readonly object playbackDataSourceIUnknown;
-        private readonly IMediaPlaybackDataSource_10586 playbackDataSource_10586;
         private readonly IMediaPlaybackDataSource_20279 playbackDataSource_20279;
+        private readonly IMediaPlaybackDataSource_10586 playbackDataSource_10586;
+        private readonly int numSelectInterface = 0;
 
         internal object GetIUnknownInterface { get => playbackDataSourceIUnknown; }
 
-        internal MediaPlaybackDataSource(object playbackDataSourceIUnknown, ushort OSBuild)
+        internal MediaPlaybackDataSource(object playbackDataSourceIUnknown)
         {
-            this.osbuild = OSBuild;
             this.playbackDataSourceIUnknown = playbackDataSourceIUnknown;
-            if (osbuild >= 20279)
-                playbackDataSource_20279 = (IMediaPlaybackDataSource_20279)playbackDataSourceIUnknown;
+
+            //Since QI is a bit costly and 20279 isn't used (Windows Insider build ONLY), it's arranged to test 10586 interface FIRST
+            if (playbackDataSourceIUnknown is IMediaPlaybackDataSource_10586 tPlaybackDataSource_10586)
+            {
+                numSelectInterface = 10586;
+                playbackDataSource_10586 = tPlaybackDataSource_10586;
+            }
+            else if (playbackDataSourceIUnknown is IMediaPlaybackDataSource_20279 tPlaybackDataSource_20279)
+            {
+                numSelectInterface = 20279;
+                playbackDataSource_20279 = tPlaybackDataSource_20279;
+            }
             else
-                playbackDataSource_10586 = (IMediaPlaybackDataSource_10586)playbackDataSourceIUnknown;
+            {
+                throw new NotSupportedException("QueryInterface failed due to non-available interface/guid");
+            }
         }
 
         public static MediaPlaybackType MediaSchemaToMediaPlaybackType(string mediaSchema)
@@ -63,7 +74,7 @@ namespace NPSMLib
             string[] genres = new string[0];
             uint trackNumber = 0, albumTrackCount = 0;
 
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.GetMediaObjectInfo(out propStore);
             else
                 playbackDataSource_10586.GetMediaObjectInfo(out propStore);
@@ -135,7 +146,7 @@ namespace NPSMLib
 
             IPropertyStore propStore;
 
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.GetMediaObjectInfo(out propStore);
             else
                 playbackDataSource_10586.GetMediaObjectInfo(out propStore);
@@ -173,7 +184,7 @@ namespace NPSMLib
         public MediaPlaybackInfo GetMediaPlaybackInfo()
         {
             MediaPlaybackInfo info;
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.GetMediaPlaybackInfo(out info);
             else
                 playbackDataSource_10586.GetMediaPlaybackInfo(out info);
@@ -183,7 +194,7 @@ namespace NPSMLib
         public MediaTimelineProperties GetMediaTimelineProperties()
         {
             MediaTimelineProperties props;
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.GetMediaTimelineProperties(out props);
             else
                 playbackDataSource_10586.GetMediaTimelineProperties(out props);
@@ -193,7 +204,7 @@ namespace NPSMLib
         public string GetParentApplicationId()
         {
             string id;
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.GetParentApplicationId(out id);
             else
                 playbackDataSource_10586.GetParentApplicationId(out id);
@@ -202,7 +213,7 @@ namespace NPSMLib
 
         public void SendMediaPlaybackCommand(MediaPlaybackCommands command)
         {
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.SendMediaPlaybackCommand(command);
             else
                 playbackDataSource_10586.SendMediaPlaybackCommand(command);
@@ -210,7 +221,7 @@ namespace NPSMLib
 
         public void SendPlaybackPositionChangeRequest(long requestedPlaybackPosition)
         {
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
             else
                 playbackDataSource_10586.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
@@ -218,7 +229,7 @@ namespace NPSMLib
 
         public void SendPlaybackRateChangeRequest(double requestedPlaybackRate)
         {
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.SendPlaybackRateChangeRequest(requestedPlaybackRate);
             else
                 playbackDataSource_10586.SendPlaybackRateChangeRequest(requestedPlaybackRate);
@@ -226,7 +237,7 @@ namespace NPSMLib
 
         public void SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode)
         {
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.SendRepeatModeChangeRequest(requestedRepeatMode);
             else
                 playbackDataSource_10586.SendRepeatModeChangeRequest(requestedRepeatMode);
@@ -234,7 +245,7 @@ namespace NPSMLib
 
         public void SendShuffleEnabledChangeRequest(bool requestedShuffle)
         {
-            if (osbuild >= 20279)
+            if (numSelectInterface == 20279)
                 playbackDataSource_20279.SendShuffleEnabledChangeRequest(requestedShuffle);
             else
                 playbackDataSource_10586.SendShuffleEnabledChangeRequest(requestedShuffle);
@@ -244,46 +255,41 @@ namespace NPSMLib
 
         MediaPlaybackDataChangedEventHandler eventHandler;
 
-        int subscribers = 0;
-        readonly object objectLock = new object();
-
-        private event EventHandler<MediaPlaybackDataChangedArgs> bMediaPlaybackDataChanged;
+        readonly object subscriptionLock = new object();
+        private event EventHandler<MediaPlaybackDataChangedArgs> _mediaPlaybackDataChanged;
         public event EventHandler<MediaPlaybackDataChangedArgs> MediaPlaybackDataChanged
         {
             add
             {
-                lock (objectLock)
+                lock (subscriptionLock)
                 {
-                    if (subscribers == 0)
+                    if (_mediaPlaybackDataChanged == null)
                     {
-                        eventHandler = new MediaPlaybackDataChangedEventHandler(this, osbuild);
+                        eventHandler = new MediaPlaybackDataChangedEventHandler(this);
                         NPSMEventRegistrationToken token;
-                        if (osbuild >= 20279)
+                        if (numSelectInterface == 20279)
                             playbackDataSource_20279.RegisterEventHandler(eventHandler, out token);
                         else
                             playbackDataSource_10586.RegisterEventHandler(eventHandler, out token);
                         eventHandler.Token = token;
                     }
-                    subscribers++;
 
-                    bMediaPlaybackDataChanged += value;
+                    _mediaPlaybackDataChanged += value;
                 }
             }
             remove
             {
-                lock (objectLock)
+                lock (subscriptionLock)
                 {
-                    subscribers--;
-                    if (subscribers == 0)
+                    _mediaPlaybackDataChanged -= value;
+                    if (_mediaPlaybackDataChanged == null)
                     {
-                        if (osbuild >= 20279)
+                        if (numSelectInterface == 20279)
                             playbackDataSource_20279.UnregisterEventHandler(eventHandler.Token);
                         else
                             playbackDataSource_10586.UnregisterEventHandler(eventHandler.Token);
                         eventHandler = null;
                     }
-
-                    bMediaPlaybackDataChanged -= value;
                 }
             }
         }
@@ -292,17 +298,15 @@ namespace NPSMLib
         {
             internal NPSMEventRegistrationToken Token { get; set; }
             private MediaPlaybackDataSource CurrentMediaPlaybackInstance { get; set; }
-            private ushort OSBuild { get; set; }
-            public MediaPlaybackDataChangedEventHandler(MediaPlaybackDataSource currentSessionInstance, ushort osbuild)
+            public MediaPlaybackDataChangedEventHandler(MediaPlaybackDataSource currentSessionInstance)
             {
                 CurrentMediaPlaybackInstance = currentSessionInstance;
-                OSBuild = osbuild;
             }
 
             public void OnMediaPlaybackDataChangedEvent(object source /* IMediaPlaybackDataSource */, MediaPlaybackDataChangedEvent dataChangedEvent)
             {
-                CurrentMediaPlaybackInstance.bMediaPlaybackDataChanged?.Invoke(CurrentMediaPlaybackInstance, 
-                    new MediaPlaybackDataChangedArgs { MediaPlaybackDataSource = new MediaPlaybackDataSource(source, OSBuild), DataChangedEvent = dataChangedEvent });
+                CurrentMediaPlaybackInstance._mediaPlaybackDataChanged?.Invoke(CurrentMediaPlaybackInstance, 
+                    new MediaPlaybackDataChangedArgs { MediaPlaybackDataSource = new MediaPlaybackDataSource(source), DataChangedEvent = dataChangedEvent });
             }
         }
 
