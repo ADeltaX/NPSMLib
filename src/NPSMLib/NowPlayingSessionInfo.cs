@@ -3,6 +3,9 @@ using static NPSMLib.Interop.COMInterop;
 
 namespace NPSMLib
 {
+    /// <summary>
+    /// Represents the information associated with a <see cref="NowPlayingSession"/>.
+    /// </summary>
     public class NowPlayingSessionInfo : IEquatable<NowPlayingSessionInfo>
     {
         private readonly object infoIUnknown;
@@ -32,6 +35,12 @@ namespace NPSMLib
             }
         }
 
+        /// <summary>
+        /// Gets the information associated with the session.
+        /// </summary>
+        /// <param name="hWnd">The window handle associated with the session's source application.</param>
+        /// <param name="PID">The process ID of the session's source application.</param>
+        /// <param name="DeviceId">The device ID of the session's source application.</param>
         public void GetInfo(out IntPtr hWnd, out uint PID, out string DeviceId)
         {
             if (numSelectInterface == 19041)
@@ -40,6 +49,7 @@ namespace NPSMLib
                 info_10586.GetInfo(out hWnd, out PID, out DeviceId);
         }
 
+        /// <inheritdoc/>
         public bool Equals(NowPlayingSessionInfo other)
         {
             bool val;
@@ -51,9 +61,10 @@ namespace NPSMLib
         }
 
         /// <summary>
-        /// 19041+
+        /// Gets whether the session is running in a container OS.
+        /// Only supported for Windows 10 19041+
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A <see cref="bool"/> that describes whether the session is running in a container OS or not.</returns>
         public bool IsRunningInContainerOS()
         {
             bool inContainerOS = false;

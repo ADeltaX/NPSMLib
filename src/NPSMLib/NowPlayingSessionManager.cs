@@ -5,17 +5,22 @@ using static NPSMLib.Interop.COMInterop;
 
 namespace NPSMLib
 {
+    /// <summary>
+    /// Provides access to playback sessions throughout the system that have integrated
+    /// with SystemMediaTransportControls to provide playback info and allow remote control.
+    /// </summary>
     public class NowPlayingSessionManager
     {
         private readonly object sessionManagerIUnknown;
+
         //cache to prevent calling QueryInterface each time it casts
         private readonly INowPlayingSessionManager_19041 sessionManager_19041;
+
         private readonly INowPlayingSessionManager_10586 sessionManager_10586;
         private readonly int numSelectInterface = 0;
 
         /// <summary>
-        /// Handles Now Playing sessions.
-        /// Can throw if the underlaying COM interface fails to create
+        /// Creates an instance of the <see cref="NowPlayingSessionManager"/>.
         /// </summary>
         public NowPlayingSessionManager()
         {
@@ -35,15 +40,16 @@ namespace NPSMLib
             else
             {
                 throw new NotSupportedException("CoCreateInstance failed to create an instance due to non-available guid");
-            }                
+            }
         }
 
         /// <summary>
-        /// Get the current active session
+        /// Gets the current session. This is the session that the system believes the user would most likely want to control.
         /// </summary>
-        public NowPlayingSession CurrentSession 
-        { 
-            get 
+        /// <returns>The <see cref="NowPlayingSession"/> that represents this remote session.</returns>
+        public NowPlayingSession CurrentSession
+        {
+            get
             {
                 object sessionIUnknown = null;
 
@@ -53,11 +59,11 @@ namespace NPSMLib
                     sessionManager_10586.get_CurrentSession(out sessionIUnknown);
 
                 return sessionIUnknown == null ? null : new NowPlayingSession(sessionIUnknown);
-            } 
+            }
         }
 
         /// <summary>
-        /// Get the number of sessions
+        /// Get the total number of sessions.
         /// </summary>
         public ulong Count
         {
@@ -73,6 +79,10 @@ namespace NPSMLib
             }
         }
 
+        /// <summary>
+        /// Gets all of the available sessions.
+        /// </summary>
+        /// <returns>An array of all available <see cref="NowPlayingSession"/>.</returns>
         public NowPlayingSession[] GetSessions()
         {
             object[] sessionsIUnknown;
@@ -100,6 +110,10 @@ namespace NPSMLib
                 sessionManager_10586.SetCurrentNextSession();
         }
 
+        /// <summary>
+        /// Sets the current session. This is the session that the system believes the user would most likely want to control.
+        /// </summary>
+        /// <param name="pInfo">The <see cref="NowPlayingSessionInfo"/> associated with the corresponding session to set as current.</param>
         public void SetCurrentSession(NowPlayingSessionInfo pInfo)
         {
             if (numSelectInterface == 19041)
@@ -108,6 +122,10 @@ namespace NPSMLib
                 sessionManager_10586.SetCurrentSession(pInfo.GetIUnknownInterface);
         }
 
+        /// <summary>
+        /// Removes the requested session from the sessions list.
+        /// </summary>
+        /// <param name="pInfo">The <see cref="NowPlayingSessionInfo"/> associated with the corresponding session to remove.</param>
         public void RemoveSession(NowPlayingSessionInfo pInfo)
         {
             if (numSelectInterface == 19041)
@@ -116,6 +134,11 @@ namespace NPSMLib
                 sessionManager_10586.RemoveSession(pInfo.GetIUnknownInterface);
         }
 
+        /// <summary>
+        /// Finds and returns the <see cref="NowPlayingSession"/> associated with a <see cref="NowPlayingSessionInfo"/>.
+        /// </summary>
+        /// <param name="pInfo">The <see cref="NowPlayingSessionInfo"/> to find the <see cref="NowPlayingSession"/> for.</param>
+        /// <returns></returns>
         public NowPlayingSession FindSession(NowPlayingSessionInfo pInfo)
         {
             object sessionIUnknown;
@@ -140,6 +163,14 @@ namespace NPSMLib
                 sessionManager_10586.Refresh(hWnd);
         }
 
+        /// <summary>
+        /// Updates a session.
+        /// </summary>
+        /// <param name="fEnabled">The requested enabled state to apply.</param>
+        /// <param name="hwnd">The window handle associated with the session's source application.</param>
+        /// <param name="dwPID">The process ID of the session's source application.</param>
+        /// <param name="unknown">Unknown.</param>
+        /// <param name="pSource">The <see cref="MediaPlaybackDataSource"/> associated with the session.</param>
         public void Update(bool fEnabled, IntPtr hwnd, uint dwPID, ulong unknown, MediaPlaybackDataSource pSource)
         {
             if (numSelectInterface == 19041)
@@ -153,11 +184,15 @@ namespace NPSMLib
 
         #region Event
 
-        NowPlayingSessionManagerEventHandler eventHandler;
+        private NowPlayingSessionManagerEventHandler eventHandler;
 
-        readonly object subscriptionLock = new object();
+        private readonly object subscriptionLock = new object();
 
         private event EventHandler<NowPlayingSessionManagerEventArgs> _sessionListChanged;
+
+        /// <summary>
+        /// Occurs when the sessions list have changed.
+        /// </summary>
         public event EventHandler<NowPlayingSessionManagerEventArgs> SessionListChanged
         {
             add
@@ -196,29 +231,50 @@ namespace NPSMLib
             }
         }
 
-        class NowPlayingSessionManagerEventHandler : INowPlayingSessionManagerEventHandler
+        private class NowPlayingSessionManagerEventHandler : INowPlayingSessionManagerEventHandler
         {
             internal NPSMEventRegistrationToken Token { get; set; }
             private NowPlayingSessionManager CurrentSessionInstance { get; set; }
+
             public NowPlayingSessionManagerEventHandler(NowPlayingSessionManager currentSessionInstance)
             {
                 CurrentSessionInstance = currentSessionInstance;
             }
+
             public void OnChange(NowPlayingSessionManagerNotificationType notificationType, object pINowPlayingSessionInfoIUnknown, [MarshalAs(UnmanagedType.LPWStr)] string unknown)
             {
                 //forward to subscribers
-                CurrentSessionInstance._sessionListChanged?.Invoke(CurrentSessionInstance, 
+                CurrentSessionInstance._sessionListChanged?.Invoke(CurrentSessionInstance,
                     new NowPlayingSessionManagerEventArgs { NotificationType = notificationType, NowPlayingSessionInfo = new NowPlayingSessionInfo(pINowPlayingSessionInfoIUnknown), SessionTypeString = unknown });
             }
         }
 
         #endregion
-
     }
+
+    /// <summary>
+    /// Represents arguments for a <see cref="NowPlayingSessionManager.SessionListChanged"/> event.
+    /// </summary>
     public class NowPlayingSessionManagerEventArgs : EventArgs
     {
+        /// <summary>
+        /// Gets the change notification type of the event.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="NowPlayingSessionManagerNotificationType"/> that represents the
+        /// the change notification type of the event.
+        /// </returns>
         public NowPlayingSessionManagerNotificationType NotificationType { get; internal set; }
+
+        /// <summary>
+        /// Gets the changed session's information.
+        /// </summary>
+        /// <return>A <see cref="NowPlayingSessionInfo"/> that represents the changed session which gave raise to the event.</return>
         public NowPlayingSessionInfo NowPlayingSessionInfo { get; internal set; }
+
+        /// <summary>
+        /// Gets the type of the session.
+        /// </summary>
         public string SessionTypeString { get; internal set; }
     }
 }

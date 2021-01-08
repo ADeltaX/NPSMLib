@@ -3,6 +3,9 @@ using static NPSMLib.Interop.COMInterop;
 
 namespace NPSMLib
 {
+    /// <summary>
+    /// Represents a media playback session from another application providing info about that session and possibly allowing control.
+    /// </summary>
     public class NowPlayingSession
     {
         private readonly object sessionIUnknown;
@@ -30,9 +33,13 @@ namespace NPSMLib
             }
         }
 
-        public IntPtr Hwnd 
-        { 
-            get 
+        /// <summary>
+        /// Gets the handle of the window associated with this session's source application.
+        /// </summary>
+        /// <returns>An <see cref="IntPtr"/> that represents the handle of the window associated with this session's source application.</returns>
+        public IntPtr Hwnd
+        {
+            get
             {
                 IntPtr hWnd;
                 if (numSelectInterface == 14393)
@@ -40,8 +47,13 @@ namespace NPSMLib
                 else
                     session_10586.get_HWND(out hWnd);
                 return hWnd;
-            } 
+            }
         }
+
+        /// <summary>
+        /// Gets the process ID of this session's source application.
+        /// </summary>
+        /// <returns>The process ID of this session's source application.</returns>
         public uint PID
         {
             get
@@ -54,6 +66,11 @@ namespace NPSMLib
                 return pid;
             }
         }
+
+        /// <summary>
+        /// Gets the render device ID of this session's source application.
+        /// </summary>
+        /// <returns>The render device ID of this session's source application.</returns>
         public string RenderDeviceId
         {
             get
@@ -66,6 +83,11 @@ namespace NPSMLib
                 return id;
             }
         }
+
+        /// <summary>
+        /// Gets the application ID of this session's source application.
+        /// </summary>
+        /// <returns>The application ID of this session's source application.</returns>
         public string SourceAppId
         {
             get
@@ -78,6 +100,11 @@ namespace NPSMLib
                 return id;
             }
         }
+
+        /// <summary>
+        /// Gets the source device ID of this session's source application.
+        /// </summary>
+        /// <returns>The source device ID of this session's source application.</returns>
         public string SourceDeviceId
         {
             get
@@ -108,6 +135,10 @@ namespace NPSMLib
         }
 
         //TODO: Can throw if fail
+        /// <summary>
+        /// Gets the <see cref="MediaPlaybackDataSource"/> for this session.
+        /// </summary>
+        /// <returns>The <see cref="MediaPlaybackDataSource"/> associated this session.</returns>
         public MediaPlaybackDataSource ActivateMediaPlaybackDataSource()
         {
             object imediaPlaybackDataSourceIUnknown;
@@ -118,6 +149,10 @@ namespace NPSMLib
             return new MediaPlaybackDataSource(imediaPlaybackDataSourceIUnknown);
         }
 
+        /// <summary>
+        /// Gets the type of this session.
+        /// </summary>
+        /// <returns>A <see cref="NowPlayingSessionType"/> that represents the type of this session.</returns>
         public NowPlayingSessionType GetSessionType()
         {
             NowPlayingSessionType pType;
@@ -129,6 +164,10 @@ namespace NPSMLib
         }
 
         //TODO: Can throw if fail
+        /// <summary>
+        /// Gets the <see cref="NowPlayingSessionInfo"/> for this session.
+        /// </summary>
+        /// <returns>The <see cref="NowPlayingSessionInfo"/> associated this session.</returns>
         public NowPlayingSessionInfo GetSessionInfo()
         {
             object pInfoIUnknown;
@@ -138,7 +177,6 @@ namespace NPSMLib
                 session_10586.get_Info(out pInfoIUnknown);
             return new NowPlayingSessionInfo(pInfoIUnknown);
         }
-
 
         /// <summary>
         /// Unknown, 14393+
