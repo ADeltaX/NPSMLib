@@ -263,17 +263,13 @@ namespace NPSMLib
         /// <summary>
         /// Sends a request to the media session to change its playback position to the specified position.
         /// </summary>
-        /// <remarks>
-        /// The requested playback position must be in ticks.
-        /// In case of using a <see cref="TimeSpan"/> use its <see cref="TimeSpan.Ticks"/> property.
-        /// </remarks>
-        /// <param name="requestedPlaybackPosition">The requested playback position to seek to, specified in ticks.</param>
-        public void SendPlaybackPositionChangeRequest(long requestedPlaybackPosition)
+        /// <param name="requestedPlaybackPosition">The requested playback position to seek to.</param>
+        public void SendPlaybackPositionChangeRequest(TimeSpan requestedPlaybackPosition)
         {
             if (numSelectInterface == 20279)
-                playbackDataSource_20279.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
+                playbackDataSource_20279.SendPlaybackPositionChangeRequest(requestedPlaybackPosition.Ticks);
             else
-                playbackDataSource_10586.SendPlaybackPositionChangeRequest(requestedPlaybackPosition);
+                playbackDataSource_10586.SendPlaybackPositionChangeRequest(requestedPlaybackPosition.Ticks);
         }
 
         /// <summary>

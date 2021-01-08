@@ -1,5 +1,6 @@
 ﻿using NPSMLib;
 using System;
+using System.Timers;
 
 namespace NPSM_CLI
 {
@@ -31,13 +32,11 @@ namespace NPSM_CLI
                 if (letter == 'a' || key.Key == ConsoleKey.LeftArrow)
                     src.SendMediaPlaybackCommand(MediaPlaybackCommands.Previous);
 
-                //TODO: REWIND/FASTFORWARD
+                if (letter == 'r' && session != null)
+                    src.SendMediaPlaybackCommand(MediaPlaybackCommands.Rewind);
 
-                //if (letter == 'r' && session != null)
-                //    src.SendMediaPlaybackCommand(MediaPlaybackCommands.Rewind);
-
-                //if (letter == 'f' && session != null)
-                //    src.SendMediaPlaybackCommand(MediaPlaybackCommands.FastForward);
+                if (letter == 'f' && session != null)
+                    src.SendMediaPlaybackCommand(MediaPlaybackCommands.FastForward);
 
             } while (letter != 'q');
         }
@@ -72,14 +71,33 @@ namespace NPSM_CLI
                     Console.Clear();
 
                     var mediaDetails = src.GetMediaObjectInfo();
+                    var mediaPlaybackInfo = src.GetMediaPlaybackInfo();
+                    var mediaTimeline = src.GetMediaTimelineProperties();
 
                     Console.WriteLine("Title: " + mediaDetails.Title);
                     Console.WriteLine("Artist: " + mediaDetails.Artist);
                     Console.WriteLine("Subtitle: " + mediaDetails.Subtitle);
                     Console.WriteLine("Album title: " + mediaDetails.AlbumTitle);
-                    Console.WriteLine("Source AppId: " + session.SourceAppId);
-                    Console.WriteLine("HWND: 0x" + session.Hwnd.ToString("X"));
-                    Console.WriteLine("Status: " + src.GetMediaPlaybackInfo().LastPlayingFileTime);
+                    Console.WriteLine("Media type: " + MediaPlaybackDataSource.MediaSchemaToMediaPlaybackMode(mediaDetails.MediaClassPrimaryID));
+                    Console.WriteLine("Source App Id: " + session?.SourceAppId);
+                    Console.WriteLine("Source Device Id: " + session?.SourceDeviceId);
+                    Console.WriteLine("Render Device Id: " + session?.RenderDeviceId);
+                    Console.WriteLine("HWND: 0x" + session?.Hwnd.ToString("X"));
+                    Console.WriteLine("PID: 0x" + session?.PID.ToString("X"));
+                    Console.WriteLine();
+                    Console.WriteLine("Playback state: " + mediaPlaybackInfo.PlaybackState);
+                    Console.WriteLine("Playback rate: " + mediaPlaybackInfo.PlaybackRate);
+                    Console.WriteLine("Playback mode: " + mediaPlaybackInfo.PlaybackMode);
+                    Console.WriteLine("Shuffle enabled: " + mediaPlaybackInfo.ShuffleEnabled);
+                    Console.WriteLine("Repeat mode: " + mediaPlaybackInfo.RepeatMode);
+                    Console.WriteLine("Playback CAPS: " + mediaPlaybackInfo.PlaybackCaps);
+                    Console.WriteLine("Playback PROPS: " + mediaPlaybackInfo.PropsValid);
+                    Console.WriteLine();
+                    Console.WriteLine("Start time: " + mediaTimeline.StartTime);
+                    Console.WriteLine("End time: " + mediaTimeline.EndTime);
+                    Console.WriteLine("Min seek time: " + mediaTimeline.MinSeekTime);
+                    Console.WriteLine("Max seek time: " + mediaTimeline.MaxSeekTime);
+                    Console.WriteLine("Position: " + mediaTimeline.Position);
                     Console.WriteLine("---------------------------------");
                 }
             }
