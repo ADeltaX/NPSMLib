@@ -1,9 +1,17 @@
-# WIP LIBRARY - NPSMLib (.NET Standard 1.1)
-A NowPlayingSessionManager wrapper library - used for controlling SMTC apps (e.g. Groove Music, Movies &amp; TV, etc...). Do you know [GlobalSystemMediaTransportControlsSessionManager](https://docs.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager)? Well, GSMTC is a wrapper around NPSM :)
+# NPSMLib (.NET Standard 1.1, 2.0, .NET 4.5)
+### A NowPlayingSessionManager private API wrapper library.
+Provides access to playback sessions throughout the system that have integrated with SystemMediaTransportControls to provide playback info and allow remote control.
+For example it allows controlling the playback of Groove Music remotely.
 
-## This library is in beta
-Supported versions: 10586+
+[![nuget](https://img.shields.io/nuget/v/NPSMLib?style=for-the-badge)](https://www.nuget.org/packages/NPSMLib)
 
-# TODO:
-- Nuget package (!)
-- Add proper documentation
+## Alternatives
+[GlobalSystemMediaTransportControlsSessionManager](https://docs.microsoft.com/en-us/uwp/api/windows.media.control.globalsystemmediatransportcontrolssessionmanager) is a WinRT API, available since 17763 (Windows 10 RS5 - version 1809). GSMTC is a wrapper around NPSM.
+
+## Supported versions:
+Windows 10 1511 (10586) or newer
+
+## Note about UWP compatibility
+Make sure you have proper capability set in your app manifest, which is required since 17763, otherwise you'll get an access denied exception.
+#### Required capability:
+<uap7:Capability Name="globalMediaControl" />
