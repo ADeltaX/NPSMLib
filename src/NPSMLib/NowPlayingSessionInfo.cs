@@ -52,25 +52,20 @@ namespace NPSMLib
         /// <inheritdoc/>
         public bool Equals(NowPlayingSessionInfo other)
         {
-            bool val;
+            bool val = false;
             if (numSelectInterface == 19041)
-                info_19041.IsEqual(other.infoIUnknown, out val);
+            {
+                //Microsoft didn't change the guid once they changed the interface structure...
+                //Since we don't know which one is which, we need to gather and test OS build...
+
+                if (NowPlayingSessionManager.OSVersion.Build >= 19582)
+                    (info_19041 as INowPlayingSessionInfo_19582).IsEqual(other.infoIUnknown, out val);
+                else
+                    info_19041.IsEqual(other.infoIUnknown, out val);
+            }
             else
                 info_10586.IsEqual(other.infoIUnknown, out val);
             return val;
-        }
-
-        /// <summary>
-        /// Gets whether the session is running in a container OS.
-        /// Only supported for Windows 10 19041+
-        /// </summary>
-        /// <returns>A <see cref="bool"/> that describes whether the session is running in a container OS or not.</returns>
-        public bool IsRunningInContainerOS()
-        {
-            bool inContainerOS = false;
-            if (numSelectInterface == 19041)
-                info_19041.IsRunningInContainerOS(out inContainerOS);
-            return inContainerOS;
         }
     }
 }

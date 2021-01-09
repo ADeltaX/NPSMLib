@@ -15,9 +15,12 @@ namespace NPSMLib
 
         //cache to prevent calling QueryInterface each time it casts
         private readonly INowPlayingSessionManager_19041 sessionManager_19041;
-
         private readonly INowPlayingSessionManager_10586 sessionManager_10586;
         private readonly int numSelectInterface = 0;
+
+        //global cache of OS version
+        private static readonly OSVersion osVersion = Helpers.GetOSVersion();
+        internal static OSVersion OSVersion { get => osVersion; }
 
         /// <summary>
         /// Creates an instance of the <see cref="NowPlayingSessionManager"/>.
@@ -85,17 +88,16 @@ namespace NPSMLib
         /// <returns>An array of all available <see cref="NowPlayingSession"/>.</returns>
         public NowPlayingSession[] GetSessions()
         {
-            object[] sessionsIUnknown;
-            uint count = 0;
-
+            uint count;
+            IntPtr sessionsIUnknownPtr;
             if (numSelectInterface == 19041)
-                sessionManager_19041.GetSessions(out count, out sessionsIUnknown);
+                sessionManager_19041.GetSessions(out count, out sessionsIUnknownPtr);
             else
-                sessionManager_10586.GetSessions(out count, out sessionsIUnknown);
+                sessionManager_10586.GetSessions(out count, out sessionsIUnknownPtr);
 
             NowPlayingSession[] array = new NowPlayingSession[count];
-            for (uint i = 0; i < count; i++)
-                array[i] = new NowPlayingSession(sessionsIUnknown[i]);
+            for (int i = 0; i < count; i++)
+                array[i] = new NowPlayingSession(Marshal.GetObjectForIUnknown(Marshal.ReadIntPtr(sessionsIUnknownPtr + (IntPtr.Size * i))));
             return array;
         }
 

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NPSM_CLI": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

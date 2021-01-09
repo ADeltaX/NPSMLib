@@ -35,7 +35,7 @@ namespace NPSMLib.Interop
 
             int RemoveSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */);
 
-            int GetSessions(out uint pdwCount, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown)] out object[] pppSessions /* INowPlayingSession[] */);
+            int GetSessions(out uint pdwCount, out IntPtr pppSessions /* INowPlayingSession[] */);
 
             int FindSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.IUnknown)] out object ppSession /* INowPlayingSession */);
 
@@ -69,7 +69,7 @@ namespace NPSMLib.Interop
 
             int RemoveSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */);
 
-            int GetSessions(out uint pdwCount, [MarshalAs(UnmanagedType.LPArray, ArraySubType = UnmanagedType.IUnknown)] out object[] pppSessions /* INowPlayingSession[] */);
+            int GetSessions(out uint pdwCount, out IntPtr pppSessions /* INowPlayingSession[] */);
 
             int FindSession([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.IUnknown)] out object ppSession /* INowPlayingSession */);
 
@@ -141,6 +141,15 @@ namespace NPSMLib.Interop
         #endregion
 
         #region INowPlayingSessionInfo
+
+        //This interface IS required since the guid is the same as 19041 one but has 1 function less in 19582+
+        [ComImport, Guid("443dcf9d-ce15-408c-866e-e6d0c434548a"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        internal interface INowPlayingSessionInfo_19582
+        {
+            int GetInfo(out IntPtr pHwnd, out uint pdwPID, [MarshalAs(UnmanagedType.LPWStr)] out string pszDeviceId);
+
+            int IsEqual([MarshalAs(UnmanagedType.IUnknown)] object pInfo /* INowPlayingSessionInfo */, [MarshalAs(UnmanagedType.Bool)] out bool pfIsEqual);
+        }
 
         //19041+
         [ComImport, Guid("443dcf9d-ce15-408c-866e-e6d0c434548a"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]

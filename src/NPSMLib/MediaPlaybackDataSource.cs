@@ -200,6 +200,8 @@ namespace NPSMLib
                     outStream.Write(buffer, 0, read);
                 } while (read > 0);
 
+                outStream.Seek(0, SeekOrigin.Begin);
+
                 NativeMethods.PropVariantClear(ref pVariant);
             }
 

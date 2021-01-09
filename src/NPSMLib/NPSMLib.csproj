@@ -5,39 +5,23 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <PackageProjectUrl>https://github.com/ADeltaX/NPSMLib</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ADeltaX/NPSMLib</RepositoryUrl>
-    <Version>0.9.0-beta</Version>
+    <Version>0.9.9</Version>
     <Description>A NowPlayingSessionManager wrapper library - used for controlling SMTC apps
 
-Supported Windows 10 versions: From 20279 to 10586</Description>
-    <PackageReleaseNotes>Support from 20279 to 10586</PackageReleaseNotes>
+Supported Windows 10 versions: 10586+ (1511 or newer)
+Compatible with UWP</Description>
+    <PackageReleaseNotes>Added documentation + uniformed API</PackageReleaseNotes>
     <Company>ADeltaX</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>ADeltaX</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyVersion>0.9.9.0</AssemblyVersion>
+    <FileVersion>0.9.9.0</FileVersion>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>.\NPSMLib.xml</DocumentationFile>
   </PropertyGroup>
 
 </Project>

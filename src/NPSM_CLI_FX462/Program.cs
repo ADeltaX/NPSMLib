@@ -1,7 +1,7 @@
 ﻿using NPSMLib;
 using System;
 
-namespace NPSM_CLI
+namespace NPSM_CLI_FX462
 {
     class Program
     {
