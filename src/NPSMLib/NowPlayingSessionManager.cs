@@ -104,36 +104,39 @@ namespace NPSMLib
         /// <summary>
         /// Sets the next session as current.
         /// </summary>
-        public void SetNextCurrentSession()
+        /// <returns>Bool indicating success.</returns>
+        public bool SetNextCurrentSession()
         {
             if (numSelectInterface == 19041)
-                sessionManager_19041.SetCurrentNextSession();
+                return sessionManager_19041.SetCurrentNextSession() == 0;
             else
-                sessionManager_10586.SetCurrentNextSession();
+                return sessionManager_10586.SetCurrentNextSession() == 0;
         }
 
         /// <summary>
         /// Sets the current session. This is the session that the system believes the user would most likely want to control.
         /// </summary>
         /// <param name="pInfo">The <see cref="NowPlayingSessionInfo"/> associated with the corresponding session to set as current.</param>
-        public void SetCurrentSession(NowPlayingSessionInfo pInfo)
+        /// <returns>Bool indicating success.</returns>
+        public bool SetCurrentSession(NowPlayingSessionInfo pInfo)
         {
             if (numSelectInterface == 19041)
-                sessionManager_19041.SetCurrentSession(pInfo.GetIUnknownInterface);
+                return sessionManager_19041.SetCurrentSession(pInfo.GetIUnknownInterface) == 0;
             else
-                sessionManager_10586.SetCurrentSession(pInfo.GetIUnknownInterface);
+                return sessionManager_10586.SetCurrentSession(pInfo.GetIUnknownInterface) == 0;
         }
 
         /// <summary>
         /// Removes the requested session from the sessions list.
         /// </summary>
         /// <param name="pInfo">The <see cref="NowPlayingSessionInfo"/> associated with the corresponding session to remove.</param>
-        public void RemoveSession(NowPlayingSessionInfo pInfo)
+        /// <returns>Bool indicating success.</returns>
+        public bool RemoveSession(NowPlayingSessionInfo pInfo)
         {
             if (numSelectInterface == 19041)
-                sessionManager_19041.RemoveSession(pInfo.GetIUnknownInterface);
+                return sessionManager_19041.RemoveSession(pInfo.GetIUnknownInterface) == 0;
             else
-                sessionManager_10586.RemoveSession(pInfo.GetIUnknownInterface);
+                return sessionManager_10586.RemoveSession(pInfo.GetIUnknownInterface) == 0;
         }
 
         /// <summary>
@@ -150,6 +153,9 @@ namespace NPSMLib
             else
                 sessionManager_10586.FindSession(pInfo.GetIUnknownInterface, out sessionIUnknown);
 
+            if (sessionIUnknown == null)
+                return null;
+
             return new NowPlayingSession(sessionIUnknown);
         }
 
@@ -157,12 +163,13 @@ namespace NPSMLib
         /// ?
         /// </summary>
         /// <param name="hWnd">Handle to the window present in any session</param>
-        public void Refresh(IntPtr hWnd)
+        /// <returns>Bool indicating success.</returns>
+        public bool Refresh(IntPtr hWnd)
         {
             if (numSelectInterface == 19041)
-                sessionManager_19041.Refresh(hWnd);
+                return sessionManager_19041.Refresh(hWnd) == 0;
             else
-                sessionManager_10586.Refresh(hWnd);
+                return sessionManager_10586.Refresh(hWnd) == 0;
         }
 
         /// <summary>
@@ -173,12 +180,13 @@ namespace NPSMLib
         /// <param name="dwPID">The process ID of the session's source application.</param>
         /// <param name="unknown">Unknown.</param>
         /// <param name="pSource">The <see cref="MediaPlaybackDataSource"/> associated with the session.</param>
-        public void Update(bool fEnabled, IntPtr hwnd, uint dwPID, ulong unknown, MediaPlaybackDataSource pSource)
+        /// <returns>Bool indicating success.</returns>
+        public bool Update(bool fEnabled, IntPtr hwnd, uint dwPID, ulong unknown, MediaPlaybackDataSource pSource)
         {
             if (numSelectInterface == 19041)
-                sessionManager_19041.Update(fEnabled, hwnd, dwPID, unknown, pSource.GetIUnknownInterface);
+                return sessionManager_19041.Update(fEnabled, hwnd, dwPID, unknown, pSource.GetIUnknownInterface) == 0;
             else
-                sessionManager_10586.Update(fEnabled, hwnd, dwPID, pSource.GetIUnknownInterface);
+                return sessionManager_10586.Update(fEnabled, hwnd, dwPID, pSource.GetIUnknownInterface) == 0;
         }
 
         //TODO

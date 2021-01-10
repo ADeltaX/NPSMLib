@@ -41,12 +41,13 @@ namespace NPSMLib
         /// <param name="hWnd">The window handle associated with the session's source application.</param>
         /// <param name="PID">The process ID of the session's source application.</param>
         /// <param name="DeviceId">The device ID of the session's source application.</param>
-        public void GetInfo(out IntPtr hWnd, out uint PID, out string DeviceId)
+        /// <returns>Bool indicating success.</returns>
+        public bool GetInfo(out IntPtr hWnd, out uint PID, out string DeviceId)
         {
             if (numSelectInterface == 19041)
-                info_19041.GetInfo(out hWnd, out PID, out DeviceId);
+                return info_19041.GetInfo(out hWnd, out PID, out DeviceId) == 0;
             else
-                info_10586.GetInfo(out hWnd, out PID, out DeviceId);
+                return info_10586.GetInfo(out hWnd, out PID, out DeviceId) == 0;
         }
 
         /// <inheritdoc/>

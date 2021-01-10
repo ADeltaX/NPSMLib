@@ -5,18 +5,19 @@
     <Platforms>AnyCPU;x64;x86</Platforms>
     <PackageProjectUrl>https://github.com/ADeltaX/NPSMLib</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ADeltaX/NPSMLib</RepositoryUrl>
-    <Version>0.9.9</Version>
+    <Version>0.9.11</Version>
     <Description>A NowPlayingSessionManager wrapper library - used for controlling SMTC apps
 
 Supported Windows 10 versions: 10586+ (1511 or newer)
 Compatible with UWP</Description>
-    <PackageReleaseNotes>Added documentation + uniformed API</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixes a crash in 19582+ builds when using "IsEqual" in NowPlayingSessionInfo instance.
+Fixes a crash when calling GetSessions() and sessions are 0.</PackageReleaseNotes>
     <Company>ADeltaX</Company>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Authors>ADeltaX</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <AssemblyVersion>0.9.9.0</AssemblyVersion>
-    <FileVersion>0.9.9.0</FileVersion>
+    <AssemblyVersion>0.9.11.0</AssemblyVersion>
+    <FileVersion>0.9.11.0</FileVersion>
   </PropertyGroup>
 
   <PropertyGroup>

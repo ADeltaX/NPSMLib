@@ -98,62 +98,65 @@ namespace NPSMLib
             else
                 playbackDataSource_10586.GetMediaObjectInfo(out propStore);
 
-            if (propStore.GetValue(ref PKEY_Title, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+            if (propStore != null)
             {
-                title = Marshal.PtrToStringUni(pVariant.union.pwszVal);
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_Title, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+                {
+                    title = Marshal.PtrToStringUni(pVariant.union.pwszVal);
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Music_Artist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
-            {
-                artist = Marshal.PtrToStringUni(pVariant.union.pwszVal);
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_Music_Artist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+                {
+                    artist = Marshal.PtrToStringUni(pVariant.union.pwszVal);
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Music_AlbumTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
-            {
-                albumTitle = Marshal.PtrToStringUni(pVariant.union.pwszVal);
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_Music_AlbumTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+                {
+                    albumTitle = Marshal.PtrToStringUni(pVariant.union.pwszVal);
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Music_TrackNumber, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
-            {
-                trackNumber = pVariant.union.ulVal;
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_Music_TrackNumber, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
+                {
+                    trackNumber = pVariant.union.ulVal;
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Music_AlbumArtist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
-            {
-                albumArtist = Marshal.PtrToStringUni(pVariant.union.pwszVal);
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_Music_AlbumArtist, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+                {
+                    albumArtist = Marshal.PtrToStringUni(pVariant.union.pwszVal);
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_AlbumTrackCount, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
-            {
-                albumTrackCount = pVariant.union.ulVal;
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_AlbumTrackCount, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_UI4)
+                {
+                    albumTrackCount = pVariant.union.ulVal;
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Media_SubTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
-            {
-                subtitle = Marshal.PtrToStringUni(pVariant.union.pwszVal);
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                if (propStore.GetValue(ref PKEY_Media_SubTitle, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+                {
+                    subtitle = Marshal.PtrToStringUni(pVariant.union.pwszVal);
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Music_Genre, out pVariant) == 0 && pVariant.vt == (VARTYPE.VT_VECTOR | VARTYPE.VT_LPWSTR))
-            {
-                var countStr = pVariant.union.calpwstr.cElems;
-                genres = new string[countStr];
-                for (int i = 0; i < countStr; i++)
-                    genres[i] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(pVariant.union.calpwstr.pElems + (IntPtr.Size * i)));
+                if (propStore.GetValue(ref PKEY_Music_Genre, out pVariant) == 0 && pVariant.vt == (VARTYPE.VT_VECTOR | VARTYPE.VT_LPWSTR))
+                {
+                    var countStr = pVariant.union.calpwstr.cElems;
+                    genres = new string[countStr];
+                    for (int i = 0; i < countStr; i++)
+                        genres[i] = Marshal.PtrToStringUni(Marshal.ReadIntPtr(pVariant.union.calpwstr.pElems + (IntPtr.Size * i)));
 
-                NativeMethods.PropVariantClear(ref pVariant);
-            }
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
 
-            if (propStore.GetValue(ref PKEY_Media_ClassPrimaryID, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
-            {
-                mediaClassPrimaryID = Marshal.PtrToStringUni(pVariant.union.pwszVal);
-                NativeMethods.PropVariantClear(ref pVariant);
+                if (propStore.GetValue(ref PKEY_Media_ClassPrimaryID, out pVariant) == 0 && pVariant.vt == VARTYPE.VT_LPWSTR)
+                {
+                    mediaClassPrimaryID = Marshal.PtrToStringUni(pVariant.union.pwszVal);
+                    NativeMethods.PropVariantClear(ref pVariant);
+                }
             }
 
             return new MediaObjectInfo(albumArtist, albumTitle, subtitle, title, artist, mediaClassPrimaryID, genres, albumTrackCount, trackNumber);
@@ -176,7 +179,7 @@ namespace NPSMLib
             else
                 playbackDataSource_10586.GetMediaObjectInfo(out propStore);
 
-            if (propStore.GetValue(ref PKEY_ThumbnailStream, out PROPVARIANT pVariant) == 0 && pVariant.vt == VARTYPE.VT_STREAM)
+            if (propStore != null && propStore.GetValue(ref PKEY_ThumbnailStream, out PROPVARIANT pVariant) == 0 && pVariant.vt == VARTYPE.VT_STREAM)
             {
                 var inStream = (IStream)Marshal.GetObjectForIUnknown(pVariant.union.pStream);
                 outStream = new MemoryStream();
@@ -254,60 +257,65 @@ namespace NPSMLib
         /// Sends a media playback command to the media session.
         /// </summary>
         /// <param name="command">The media playback command to send.</param>
-        public void SendMediaPlaybackCommand(MediaPlaybackCommands command)
+        /// <returns>Bool indicating success.</returns>
+        public bool SendMediaPlaybackCommand(MediaPlaybackCommands command)
         {
             if (numSelectInterface == 20279)
-                playbackDataSource_20279.SendMediaPlaybackCommand(command);
+                return playbackDataSource_20279.SendMediaPlaybackCommand(command) == 0;
             else
-                playbackDataSource_10586.SendMediaPlaybackCommand(command);
+                return playbackDataSource_10586.SendMediaPlaybackCommand(command) == 0;
         }
 
         /// <summary>
         /// Sends a request to the media session to change its playback position to the specified position.
         /// </summary>
         /// <param name="requestedPlaybackPosition">The requested playback position to seek to.</param>
-        public void SendPlaybackPositionChangeRequest(TimeSpan requestedPlaybackPosition)
+        /// <returns>Bool indicating success.</returns>
+        public bool SendPlaybackPositionChangeRequest(TimeSpan requestedPlaybackPosition)
         {
             if (numSelectInterface == 20279)
-                playbackDataSource_20279.SendPlaybackPositionChangeRequest(requestedPlaybackPosition.Ticks);
+                return playbackDataSource_20279.SendPlaybackPositionChangeRequest(requestedPlaybackPosition.Ticks) == 0;
             else
-                playbackDataSource_10586.SendPlaybackPositionChangeRequest(requestedPlaybackPosition.Ticks);
+                return playbackDataSource_10586.SendPlaybackPositionChangeRequest(requestedPlaybackPosition.Ticks) == 0;
         }
 
         /// <summary>
         /// Sends a request to the media session to change its playback rate to the requested value.
         /// </summary>
         /// <param name="requestedPlaybackRate">The requested playback rate to change to.</param>
-        public void SendPlaybackRateChangeRequest(double requestedPlaybackRate)
+        /// <returns>Bool indicating success.</returns>
+        public bool SendPlaybackRateChangeRequest(double requestedPlaybackRate)
         {
             if (numSelectInterface == 20279)
-                playbackDataSource_20279.SendPlaybackRateChangeRequest(requestedPlaybackRate);
+                return playbackDataSource_20279.SendPlaybackRateChangeRequest(requestedPlaybackRate) == 0;
             else
-                playbackDataSource_10586.SendPlaybackRateChangeRequest(requestedPlaybackRate);
+                return playbackDataSource_10586.SendPlaybackRateChangeRequest(requestedPlaybackRate) == 0;
         }
 
         /// <summary>
         /// Sends a request to the media session to change its repeat mode to the requested value.
         /// </summary>
         /// <param name="requestedRepeatMode">The requested auto repeat mode.</param>
-        public void SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode)
+        /// <returns>Bool indicating success.</returns>
+        public bool SendRepeatModeChangeRequest(MediaPlaybackRepeatMode requestedRepeatMode)
         {
             if (numSelectInterface == 20279)
-                playbackDataSource_20279.SendRepeatModeChangeRequest(requestedRepeatMode);
+                return playbackDataSource_20279.SendRepeatModeChangeRequest(requestedRepeatMode) == 0;
             else
-                playbackDataSource_10586.SendRepeatModeChangeRequest(requestedRepeatMode);
+                return playbackDataSource_10586.SendRepeatModeChangeRequest(requestedRepeatMode) == 0;
         }
 
         /// <summary>
         /// Sends a request to the media session to change its shuffle state to the requested value.
         /// </summary>
         /// <param name="requestedShuffle">The requested shuffle state to switch to.</param>
-        public void SendShuffleEnabledChangeRequest(bool requestedShuffle)
+        /// <returns>Bool indicating success.</returns>
+        public bool SendShuffleEnabledChangeRequest(bool requestedShuffle)
         {
             if (numSelectInterface == 20279)
-                playbackDataSource_20279.SendShuffleEnabledChangeRequest(requestedShuffle);
+                return playbackDataSource_20279.SendShuffleEnabledChangeRequest(requestedShuffle) == 0;
             else
-                playbackDataSource_10586.SendShuffleEnabledChangeRequest(requestedShuffle);
+                return playbackDataSource_10586.SendShuffleEnabledChangeRequest(requestedShuffle) == 0;
         }
 
         #region Event
