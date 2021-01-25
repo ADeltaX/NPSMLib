@@ -13,5 +13,7 @@ Windows 10 1511 (10586) or newer
 
 ## Note about UWP compatibility
 Make sure you have proper capability set in your app manifest, which is required since 17763, otherwise you'll get an access denied exception.
+## Events "\*Changed" will not work for partial trust/AppContainer executables ("pure" UWP) but it will for full trust.
+
 #### Required capability:
 <uap7:Capability Name="globalMediaControl" />
