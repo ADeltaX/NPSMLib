@@ -101,11 +101,19 @@ namespace NPSMLib
     [StructLayout(LayoutKind.Sequential)]
     public struct MediaTimelineProperties
     {
+#if NETSTANDARD2_0_OR_GREATER
         private readonly TimeSpan startTime;
         private readonly TimeSpan endTime;
         private readonly TimeSpan minSeekTime;
         private readonly TimeSpan maxSeekTime;
         private readonly TimeSpan position;
+#else
+        private readonly long startTime;
+        private readonly long endTime;
+        private readonly long minSeekTime;
+        private readonly long maxSeekTime;
+        private readonly long position;
+#endif
 
         //17134+
         private readonly long positionSetFileTime;
@@ -117,13 +125,14 @@ namespace NPSMLib
         private readonly long padding3;
         private readonly long padding4;
 
+#if NETSTANDARD2_0_OR_GREATER
         /// <summary>
         /// Gets the starting timestamp of the current media item.
         /// </summary>
         /// <returns>
         /// A <see cref="TimeSpan"/> that represents the starting timestamp of the current media item.
         /// </returns>
-        public TimeSpan StartTime { get => startTime; }
+        public TimeSpan StartTime { get =>  startTime; }
 
         /// <summary>
         /// Gets the end timestamp of the current media item.
@@ -159,6 +168,50 @@ namespace NPSMLib
         /// current as of <see cref="PositionSetFileTime"/>.
         /// </returns>
         public TimeSpan Position { get => position; }
+#else
+        /// <summary>
+        /// Gets the starting timestamp of the current media item.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TimeSpan"/> that represents the starting timestamp of the current media item.
+        /// </returns>
+        public TimeSpan StartTime { get => new TimeSpan(startTime); }
+
+        /// <summary>
+        /// Gets the end timestamp of the current media item.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TimeSpan"/> that represents the end timestamp of the current media item.
+        /// </returns>
+        public TimeSpan EndTime { get => new TimeSpan(endTime); }
+
+        /// <summary>
+        /// Gets the earliest timestamp at which the current media item can currently seek to.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TimeSpan"/> that represents the earliest timestamp
+        /// at which the current media item can currently seek to.
+        /// </returns>
+        public TimeSpan MinSeekTime { get => new TimeSpan(minSeekTime); }
+
+        /// <summary>
+        /// Gets the furthest timestamp at which the current media item can currently seek to.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TimeSpan"/> that represents the furthest timestamp
+        /// at which the current media item can currently seek to.
+        /// </returns>
+        public TimeSpan MaxSeekTime { get => new TimeSpan(maxSeekTime); }
+
+        /// <summary>
+        /// Gets the playback position, current as of <see cref="PositionSetFileTime"/>.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="TimeSpan"/> that represents the playback position,
+        /// current as of <see cref="PositionSetFileTime"/>.
+        /// </returns>
+        public TimeSpan Position { get => new TimeSpan(position); }
+#endif
 
         //17134+
         /// <summary>
